@@ -457,3 +457,13 @@ test$.subscribe((result) => {
 // Logs the following:
 // Got number: 5
 ```
+
+## Publishing the package
+
+The package is published manually right now.
+
+Steps to publish:
+
+1. Bump the version in src/package.json
+2. Update the CHANGELOG
+3. `npm run build && cd dist && npm publish`

@@ -56,6 +56,7 @@ test('expect', () => {
     try {
         const err = Err(true).expect('should fail!');
         expect_never(err, true);
+        throw new Error('Unreachable')
     }
     catch (e) {
         expect((e as Error).message).toMatch('should fail!')
@@ -67,6 +68,7 @@ test('unwrap', () => {
     try {
         const err = Err({ message: 'bad error' }).unwrap();
         expect_never(err, true);
+        throw new Error('Unreachable')
     }
     catch (e) {
         expect((e as Error).message).toMatch('{"message":"bad error"}')

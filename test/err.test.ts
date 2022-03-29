@@ -53,25 +53,17 @@ test('else, unwrapOr', () => {
 });
 
 test('expect', () => {
-    try {
+    expect(() => {
         const err = Err(true).expect('should fail!');
         expect_never(err, true);
-    }
-    catch (e) {
-        expect((e as Error).message).toMatch('should fail!')
-        expect((e as Error).cause).toEqual(true)
-    }
+    }).toThrowError('should fail!');
 });
 
 test('unwrap', () => {
-    try {
+    expect(() => {
         const err = Err({ message: 'bad error' }).unwrap();
         expect_never(err, true);
-    }
-    catch (e) {
-        expect((e as Error).message).toMatch('{"message":"bad error"}')
-        expect((e as Error).cause).toEqual({ message: 'bad error' })
-    }
+    }).toThrowError('{"message":"bad error"}');
 });
 
 test('map', () => {

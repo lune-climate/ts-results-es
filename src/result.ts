@@ -133,11 +133,11 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     expect(msg: string): never {
-        throw new Error(`${msg} - Error: ${toString(this.val)}\n${this._stack}`, { cause: this.val as any });
+        throw new Error(`${msg} - Error: ${toString(this.val)}\n${this._stack}`);
     }
 
     unwrap(): never {
-        throw new Error(`Tried to unwrap Error: ${toString(this.val)}\n${this._stack}`, { cause: this.val as any });
+        throw new Error(`Tried to unwrap Error: ${toString(this.val)}\n${this._stack}`);
     }
 
     map(_mapper: unknown): Err<E> {

@@ -9,7 +9,7 @@
     "module": "umd",
     "noEmitHelpers": false,
     "skipLibCheck": true,
-    "lib": ["es2022"],
+    "lib": ["es2015"],
     "strict": true,
     "noImplicitReturns": true,
     "baseUrl": "./",

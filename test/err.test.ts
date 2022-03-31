@@ -62,7 +62,7 @@ test('expect', () => {
 test('expectErr', () => {
     const err = Err(true).expectErr('should fail!');
     expect(err).toBe(true);
-    eq<boolean, typeof val>(true);
+    eq<boolean, typeof err>(true);
 });
 
 test('unwrap', () => {

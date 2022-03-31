@@ -59,6 +59,12 @@ test('expect', () => {
     }).toThrowError('should fail!');
 });
 
+test('expectErr', () => {
+    const err = Err(true).expectErr('should fail!');
+    expect(err).toBe(true);
+    eq<boolean, typeof val>(true);
+});
+
 test('unwrap', () => {
     expect(() => {
         const err = Err({ message: 'bad error' }).unwrap();

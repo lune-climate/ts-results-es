@@ -17,7 +17,7 @@ Brings compile-time error checking and optional values to typescript.
     -   [Unwrap](#unwrap)
     -   [Expect](#expect)
     -   [Map, MapErr](#map-and-maperr)
-    -   [andThen](#andthen)
+    -   [AndThen](#andthen)
     -   [Else](#else)
     -   [UnwrapOr](#unwrapor)
     -   [Empty](#empty)
@@ -242,7 +242,7 @@ badResult
 goodResult
     .andThen((num) => new Err(new Error('2nd error')))
     .mapErr((err) => new Error('mapped'))
-    .unwrap(); // thros Error('mapped')
+    .unwrap(); // throws Error('mapped')
 ```
 
 #### Else

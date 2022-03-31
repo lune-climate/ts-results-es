@@ -29,7 +29,7 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * Returns the contained `Err` value, if exists.  Throws an error if not.
      * @param msg the message to throw if no Err value.
      */
-    expectErr(msg: string): T;
+    expectErr(msg: string): E;
     
     /**
      * Returns the contained `Ok` value.

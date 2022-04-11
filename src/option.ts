@@ -80,7 +80,7 @@ class NoneImpl implements BaseOption<never> {
         throw new Error(`Tried to unwrap None`);
     }
 
-    map(_mapper: unknown): None {
+    map<T2>(_mapper: unknown): None {
         return this;
     }
 

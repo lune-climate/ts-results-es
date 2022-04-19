@@ -171,6 +171,8 @@ class SomeImpl<T> implements BaseOption<T> {
     }
 
     mapOr<T2>(_default_: T2, mapper: (val: T) => T2): T2 {
+        return mapper(this.val);
+    }
 
     mapOrElse<U>(_default_: () => U, mapper: (val: T) => U): U {
         return mapper(this.val);

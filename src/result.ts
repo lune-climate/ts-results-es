@@ -39,6 +39,15 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
     unwrap(): T;
 
     /**
+     * Returns the contained `Err` value.
+     * Because this function may throw, its use is generally discouraged.
+     * Instead, prefer to handle the `Ok` case explicitly.
+     *
+     * Throws if the value is an `Ok`, with a message provided by the `Ok`'s value.
+     */
+    unwrapErr(): E;
+
+    /**
      * Returns the contained `Ok` value or a provided default.
      *
      *  @see unwrapOr
@@ -170,6 +179,10 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         throw new Error(`Tried to unwrap Error: ${toString(this.val)}\n${this._stack}`, { cause: this.val as any });
     }
 
+    unwrapErr(): E {
+        return this.val;
+    }
+
     map(_mapper: unknown): Err<E> {
         return this;
     }
@@ -264,6 +277,13 @@ export class OkImpl<T> implements BaseResult<T, never> {
 
     unwrap(): T {
         return this.val;
+    }
+
+    unwrapErr(): never {
+        // The cause casting required because of the current TS definition beign overly restrictive
+        // (the definition says it has to be an Error while it can be anything).
+        // See https://github.com/microsoft/TypeScript/issues/45167
+        throw new Error(`Tried to unwrap Ok: ${toString(this.val)}`, { cause: this.val as any });
     }
 
     map<T2>(mapper: (val: T) => T2): Ok<T2> {

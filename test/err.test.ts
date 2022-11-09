@@ -82,6 +82,12 @@ test('unwrap', () => {
     }
 });
 
+test('unwrapErr', () => {
+    cconst err = Err(1).unwrapErr();
+    expect(val).toBe(1);
+    eq<number, typeof val>(true);
+});
+
 test('map', () => {
     const err = Err(3).map((x: any) => Symbol());
     expect(err).toMatchResult(Err(3));

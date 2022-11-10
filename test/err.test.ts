@@ -83,9 +83,9 @@ test('unwrap', () => {
 });
 
 test('unwrapErr', () => {
-    cconst err = Err(1).unwrapErr();
-    expect(val).toBe(1);
-    eq<number, typeof val>(true);
+    const err = Err(1).unwrapErr();
+    expect(err).toBe(1);
+    eq<number, typeof err>(true);
 });
 
 test('map', () => {

@@ -74,13 +74,13 @@ test('unwrap', () => {
 
 test('unwrapErr', () => {
     try {
-        const err = Ok(1).unwrapErr();
+        const err = Ok('boom').unwrapErr();
         expect_never(err, true);
         throw new Error('Unreachable')
     }
     catch (e) {
-        expect((e as Error).message).toMatch(1)
-        expect((e as Error).cause).toEqual(1)
+        expect((e as Error).message).toMatch('boom')
+        expect((e as Error).cause).toEqual('boom')
     }
 });
 

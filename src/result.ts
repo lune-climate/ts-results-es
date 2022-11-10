@@ -10,7 +10,6 @@ import { Option, None, Some } from './option.js';
  * pub fn or_else<F, O>(self, op: O) -> Result<T, F>
  * pub fn unwrap_or_else<F>(self, op: F) -> T
  * pub fn expect_err(self, msg: &str) -> E
- * pub fn unwrap_err(self) -> E
  * pub fn unwrap_or_default(self) -> T
  */
 interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : never> {

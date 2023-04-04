@@ -4,13 +4,18 @@
   "description": "A typescript implementation of Rust's Result and Option objects.",
   "main": "cjs/index.js",
   "module": "esm/index.js",
-  "types": "esm/index.d.ts",
   "exports": {
       ".": {
+          "types": "./esm/index.d.ts",
           "import": "./esm/index.js",
           "require": "./cjs/index.js"
+      },
+      "./rxjs-operators": {
+          "types": "./dist/esm/rxjs-operators/index.d.ts",
+          "import": "./dist/esm/rxjs-operators/index.js",
+          "require": "./dist/cjs/rxjs-operators/index.js"
       }
-  },
+ },
   "keywords": [
     "Rust",
     "Result",

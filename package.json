@@ -8,7 +8,7 @@
   "types": "esm/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/esm/rxjs-operators/index.d.ts",
+      "types": "./dist/esm/index.d.ts",
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.js"
     },

@@ -6,7 +6,6 @@
     "declaration": true,
     "declarationMap": true,
     "moduleResolution": "node",
-    "module": "umd",
     "noEmitHelpers": false,
     "skipLibCheck": true,
     "lib": ["es2022"],
@@ -16,7 +15,7 @@
     // NOTE: Don't change this from es5 - we use this to allow callable classes.
     "target": "es5",
     "forceConsistentCasingInFileNames": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "./dist"]

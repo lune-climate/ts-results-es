@@ -3,25 +3,21 @@
   "version": "3.6.0",
   "description": "A typescript implementation of Rust's Result and Option objects.",
   "private": true,
-  "main": "cjs/index.js",
-  "module": "esm/index.js",
-  "types": "esm/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/esm/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.js"
+      "import": "./dist/esm/index.mjs",
+      "require": "./dist/cjs/index.cjs",
+      "types": "./dist/index.d.ts"
     },
     "./rxjs-operators": {
-      "types": "./dist/esm/rxjs-operators/index.d.ts",
-      "import": "./dist/esm/rxjs-operators/index.js",
-      "require": "./dist/cjs/rxjs-operators/index.js"
+      "types": "./dist/rxjs-operators/index.d.ts",
+      "import": "./dist/esm/rxjs-operators/index.mjs",
+      "require": "./dist/cjs/rxjs-operators/index.cjs"
     }
   },
   "scripts": {
-    "build": "npm run clean && npm run build:ts && npm run build:copy",
-    "build:ts": "tsc -p tsconfig-cjs.json && tsc -p tsconfig-esm.json",
-    "build:copy": "copyfiles README.md LICENSE src/package.json dist --flat && copyfiles src/rxjs-operators/package.json dist/cjs --up 1 && cp package-cjs.json dist/cjs/package.json && cp package-esm.json dist/esm/package.json",
+    "build": "tsup && tsup --dts-only --outDir dist && npm run build:copy",
+    "build:copy": "copyfiles README.md LICENSE src/package.json dist --flat",
     "clean": "rm -rf dist",
     "test": "jest",
     "format": "prettier . --write"
@@ -42,6 +38,7 @@
     "rxjs": "^7.8.0",
     "ts-jest": "^26.5.4",
     "tslib": "^2.3.1",
+    "tsup": "^6.7.0",
     "typescript": "^4.6.3"
   }
 }

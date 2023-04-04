@@ -2,24 +2,24 @@
   "name": "ts-results-es",
   "version": "3.6.0",
   "description": "A typescript implementation of Rust's Result and Option objects.",
-  "main": "cjs/index.js",
-  "module": "esm/index.js",
+  "main": "cjs/index.cjs",
+  "module": "esm/index.mjs",
+  "types": "index.d.ts",
   "exports": {
       ".": {
-          "types": "./esm/index.d.ts",
-          "import": "./esm/index.js",
-          "require": "./cjs/index.js"
+          "import": "./esm/index.mjs",
+          "require": "./cjs/index.cjs"
       },
       "./rxjs-operators": {
-          "types": "./esm/rxjs-operators/index.d.ts",
-          "import": "./esm/rxjs-operators/index.js",
-          "require": "./cjs/rxjs-operators/index.js"
+          "types": "./rxjs-operators/index.d.ts",
+          "import": "./esm/rxjs-operators/index.mjs",
+          "require": "./cjs/rxjs-operators/index.cjs"
       }
  },
-  "keywords": [
-    "Rust",
-    "Result",
-    "Results",
+ "keywords": [
+   "Rust",
+   "Result",
+   "Results",
     "Option",
     "Options",
     "Typescript",

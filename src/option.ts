@@ -8,10 +8,10 @@ interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never
     /**
      * Returns the contained `Some` value, if exists.  Throws an error if not.
      *
-     * If you know you're dealing with `Some` and the compiler knows it too you should use
-     * `val` instead. While `expect()` and `val` on `Some` will both return the same value
-     * using `val` is preferable because it makes it clear that there won't be an exception
-     * thrown on access.
+     * If you know you're dealing with `Some` and the compiler knows it too (because you tested
+     * `some` or `none`) you should use `val` instead. While `Some`'s `expect()` and `val` will
+     * both return the same value using `val` is preferable because it makes it clear that
+     * there won't be an exception thrown on access.
      *
      * @param msg the message to throw if no Some value.
      */
@@ -22,10 +22,10 @@ interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never
      * Because this function may throw, its use is generally discouraged.
      * Instead, prefer to handle the `None` case explicitly.
      *
-     * If you know you're dealing with `Some` and the compiler knows it too you should use
-     * `val` instead. While `unwrap()` and `val` on `Some` will both return the same value
-     * using `val` is preferable because it makes it clear that there won't be an exception
-     * thrown on access.
+     * If you know you're dealing with `Some` and the compiler knows it too (because you tested
+     * `some` or `none`) you should use `val` instead. While `Some`'s `unwrap()` and `val` will
+     * both return the same value using `val` is preferable because it makes it clear that
+     * there won't be an exception thrown on access.
      *
      * Throws if the value is `None`.
      */

@@ -135,3 +135,9 @@ test('or / orElse', () => {
     expect(Some(1).or(Some(2))).toEqual(Some(1))
     expect(Some(1).orElse(() => {throw new Error('Call unexpected')})).toEqual(Some(1))
 })
+
+test('of', () => {
+    expect(Option.of(1)).toEqual(Some(1));
+    expect(Option.of(null)).toEqual(None);
+    expect(Option.of(undefined)).toEqual(None);
+});

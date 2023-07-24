@@ -308,4 +308,8 @@ export namespace Option {
     export function isOption<T = any>(value: unknown): value is Option<T> {
         return value instanceof Some || value === None;
     }
+
+    export function of<T>(value: T | null | undefined): Option<T> {
+        return value === null || value === undefined ? None : Some(value);
+    }
 }

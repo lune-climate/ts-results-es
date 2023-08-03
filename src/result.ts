@@ -17,6 +17,10 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
     /**
      * Returns the contained `Ok` value, if exists.  Throws an error if not.
      *
+     * The thrown error's
+     * [`cause'](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause)
+     * is set to value contained in `Err`.
+     *
      * If you know you're dealing with `Ok` and the compiler knows it too (because you tested
      * `ok` or `err`) you should use `val` instead. While `Ok`'s `expect()` and `val` will
      * both return the same value using `val` is preferable because it makes it clear that

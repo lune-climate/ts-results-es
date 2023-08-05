@@ -11,10 +11,10 @@ const resolveJson = (specifier) => {
 
 
 const paths = {
-    'cjs' : path.join(__dirname, 'dist', 'cjs', 'package.json'),
-    'esm': path.join(__dirname, 'dist', 'esm', 'package.json'),
-    'cjs/rxjs-operators': path.join(__dirname, 'dist', 'cjs', 'rxjs-operators', 'package.json'),
-    'esm/rxjs-operators': path.join(__dirname, 'dist', 'esm', 'rxjs-operators', 'package.json')
+    'cjs' : path.join(process.cwd(), 'dist', 'cjs', 'package.json'),
+    'esm': path.join(process.cwd(), 'dist', 'esm', 'package.json'),
+    'cjs/rxjs-operators': path.join(process.cwd(), 'dist', 'cjs', 'rxjs-operators', 'package.json'),
+    'esm/rxjs-operators': path.join(process.cwd(), 'dist', 'esm', 'rxjs-operators', 'package.json')
 }
 const entries = Object.entries(paths);
 

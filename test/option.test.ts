@@ -15,6 +15,11 @@ test('basic invariants', () => {
     expect(Option.isOption(someNum)).toBe(true);
     expect(Option.isOption(None)).toBe(true);
     expect(Option.isOption('foo')).toBe(false);
+
+    expect(None.isSome()).toBe(false)
+    expect(None.isNone()).toBe(true)
+    expect(someNum.isSome()).toBe(true)
+    expect(someNum.isNone()).toBe(false)
 });
 
 test('type narrowing', () => {

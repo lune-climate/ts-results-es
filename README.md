@@ -18,6 +18,7 @@ Notable changes compared to the original package:
   `orElse()`
 * `Result` also gained extra methods: `mapOr()`, `mapOrElse()`,
   `expectErr()`, `or()`, `orElse()`
+* `Ok` and `Err` no longer have the `val` property – it's `Ok.value` and `Err.error` now
 
 We'll try to get the changes merged into the upstream package so that this fork
 can become obsolete.

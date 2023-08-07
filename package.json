@@ -18,8 +18,8 @@
       "require": "./dist/cjs/index.js"
     },
     "./rxjs-operators": {
-      "import": "./dist/esm/rxjs-operators.js",
-      "require": "./dist/cjs/rxjs-operators.js"
+      "import": "./dist/esm/rxjs-operators/index.js",
+      "require": "./dist/cjs/rxjs-operators/index.js"
     }
   },
   "repository": {

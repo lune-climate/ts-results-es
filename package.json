@@ -5,22 +5,22 @@
   "scripts": {
     "build": "npm run clean && npm run build:ts && npm run build:copy",
     "build:ts": "tsc -p tsconfig-cjs.json && tsc -p tsconfig-esm.json",
-    "build:copy": "node scripts/build-copy.js",
-    "clean": "node scripts/clean.mjs",
+    "build:copy": "cp package-cjs.json dist/cjs/package.json && cp package-esm.json dist/esm/package.json",
+    "clean": "rm -rf dist",
     "test": "jest",
     "format": "prettier . --write"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "exports": {
-      ".": {
-          "import": "./dist/esm/index.js",
-          "require": "./dist/cjs/index.js"
-      },
-      "./rxjs-operators": {
-        "import": "./dist/esm/rxjs-operators/index.js",
-        "require": "./dist/cjs/rxjs-operators/index.js"
-      }
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./rxjs-operators": {
+      "import": "./dist/esm/rxjs-operators/index.js",
+      "require": "./dist/cjs/rxjs-operators/index.js"
+    }
   },
   "repository": {
     "type": "git",
@@ -49,6 +49,7 @@
   "devDependencies": {
     "@types/jest": "^26.0.22",
     "conditional-type-checks": "^1.0.5",
+    "copyfiles": "^2.4.1",
     "jest": "^26.6.3",
     "prettier": "^2.2.1",
     "rxjs": "^6.6.7",

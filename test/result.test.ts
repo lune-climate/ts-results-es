@@ -25,13 +25,13 @@ test('Err<E> | Ok<T> should be Result<T, E>', () => {
 
 test('Type can be narrowed using ok & err', () => {
     const r1 = Ok(0) as Result<number, string>;
-    if (r1.ok) {
+    if (r1.isOk()) {
         eq<Ok<number>, typeof r1>(true);
     } else {
         eq<Err<string>, typeof r1>(true);
     }
 
-    if (r1.err) {
+    if (r1.isErr()) {
         eq<Err<string>, typeof r1>(true);
     } else {
         eq<Ok<number>, typeof r1>(true);
@@ -115,7 +115,7 @@ test('Result.all', () => {
     eq<typeof all1, Result<[number, boolean], never>>(true);
 
     const all3 = Result.all(err0, err1);
-    expect(all3).toMatchResult(Err(err0.val));
+    expect(all3).toMatchResult(Err(err0.error));
     eq<typeof all3, Result<[never, never], symbol | Error>>(true);
 
     const all4 = Result.all(...([] as Result<string, number>[]));
@@ -143,7 +143,7 @@ test('Result.any', () => {
     eq<typeof any1, Result<number | boolean, [never, never]>>(true);
 
     const any3 = Result.any(err0, err1);
-    expect(any3).toMatchResult(Err([err0.val, err1.val]));
+    expect(any3).toMatchResult(Err([err0.error, err1.error]));
     eq<typeof any3, Result<never, [symbol, Error]>>(true);
 
     const any4 = Result.any(...([] as Result<string, number>[]));
@@ -212,7 +212,7 @@ test('safeUnwrap', () => {
     // @ts-expect-error
     result.safeUnwrap();
 
-    if (result.ok) {
+    if (result.isOk()) {
         const val = result.safeUnwrap();
         eq<typeof val, number>(true);
         expect(val).toEqual(1);
@@ -250,8 +250,8 @@ test('To option', () => {
 
 test('or / orElse', () => {
     expect(Err('error').or(Ok(1))).toEqual(Ok(1))
-    expect(Err('error').orElse(() => Ok(1))).toEqual(Ok(1))
+    expect(Err('error').orElse((error) => Ok(error.length))).toEqual(Ok(5))
 
     expect(Ok(1).or(Ok(2))).toEqual(Ok(1))
-    expect(Ok(1).orElse(() => {throw new Error('Call unexpected')})).toEqual(Ok(1))
+    expect(Ok(1).orElse((_error) => {throw new Error('Call unexpected')})).toEqual(Ok(1))
 })

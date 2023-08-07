@@ -5,44 +5,49 @@ const someString = Some('foo');
 const someNum = new Some(10);
 
 test('basic invariants', () => {
-    expect(someString.some).toBeTruthy();
-    expect(someNum.some).toBeTruthy();
+    expect(someString.isSome()).toBeTruthy();
+    expect(someNum.isSome()).toBeTruthy();
     expect(None).toBe(None);
-    expect(someString.val).toBe('foo');
-    expect(someNum.val).toBe(10);
+    expect(someString.value).toBe('foo');
+    expect(someNum.value).toBe(10);
 
     expect(Option.isOption(someString)).toBe(true);
     expect(Option.isOption(someNum)).toBe(true);
     expect(Option.isOption(None)).toBe(true);
     expect(Option.isOption('foo')).toBe(false);
+
+    expect(None.isSome()).toBe(false)
+    expect(None.isNone()).toBe(true)
+    expect(someNum.isSome()).toBe(true)
+    expect(someNum.isNone()).toBe(false)
 });
 
 test('type narrowing', () => {
     const opt = None as Option<string>;
-    if (opt.some) {
+    if (opt.isSome()) {
         eq<typeof opt, Some<string>>(true);
-        eq<typeof opt.val, string>(true);
+        eq<typeof opt.value, string>(true);
     } else {
         eq<typeof opt, None>(true);
     }
 
-    if (!opt.some) {
+    if (!opt.isSome()) {
         eq<typeof opt, None>(true);
     } else {
         eq<typeof opt, Some<string>>(true);
-        eq<typeof opt.val, string>(true);
+        eq<typeof opt.value, string>(true);
     }
 
-    if (opt.none) {
+    if (opt.isNone()) {
         eq<typeof opt, None>(true);
     } else {
         eq<typeof opt, Some<string>>(true);
-        eq<typeof opt.val, string>(true);
+        eq<typeof opt.value, string>(true);
     }
 
-    if (!opt.none) {
+    if (!opt.isNone()) {
         eq<typeof opt, Some<string>>(true);
-        eq<typeof opt.val, string>(true);
+        eq<typeof opt.value, string>(true);
     } else {
         eq<typeof opt, None>(true);
     }

@@ -18,6 +18,13 @@ Notable changes compared to the original package:
   `orElse()`
 * `Result` also gained extra methods: `mapOr()`, `mapOrElse()`,
   `expectErr()`, `or()`, `orElse()`
+* `Ok` and `Err` no longer have the `val` property – it's `Ok.value` and `Err.error` now
+* There is `Some.value` which replaced `Some.val`
+* Boolean flags were replaced with methods:
+  * `Option.some` -> `Option.isSome()`
+  * `Option.none` -> `Option.isNone()`
+  * `Result.ok` -> `Result.isOk()`
+  * `Result.err` -> `Result.isErr()`
 
 We'll try to get the changes merged into the upstream package so that this fork
 can become obsolete.
@@ -106,12 +113,12 @@ function readFile(path: string): Result<string, 'invalid path'> {
 
 // Typescript now forces you to check whether you have a valid result at compile time.
 const result = readFile('test.txt');
-if (result.ok) {
+if (result.isOk()) {
     // text contains the file's content
-    const text = result.val;
+    const text = result.value;
 } else {
     // err equals 'invalid path'
-    const err = result.val;
+    const err = result.error;
 }
 ```
 
@@ -156,7 +163,7 @@ console.log(optionalUrl); // Some(URL('...'))
 
 // To extract the value, do this:
 if (optionalUrl.some) {
-    const url: URL = optionalUrl.val;
+    const url: URL = optionalUrl.value;
 }
 ```
 
@@ -177,20 +184,20 @@ let errorResult: Result<number, Error> = Err(new Error('bad number!'));
 _Note: Typescript currently has a [bug](https://github.com/microsoft/TypeScript/issues/10564), making this type narrowing only work when `strictNullChecks` is turned on._
 ```typescript
 let result: Result<number, Error> = Ok(1);
-if (result.ok) {
-    // Typescript knows that result.val is a number because result.ok was true
-    let number = result.val + 1;
+if (result.isOk()) {
+    // Typescript knows that result.value is a number because result.isOk() was true
+    let number = result.value + 1;
 } else {
-    // Typescript knows that result.val is an `Error` because result.ok was false
-    console.error(result.val.message);
+    // Typescript knows that result.error is an `Error` because result.isOk() was false
+    console.error(result.error.message);
 }
 
-if (result.err) {
-    // Typescript knows that result.val is an `Error` because result.err was true
-    console.error(result.val.message);
+if (result.isErr()) {
+    // Typescript knows that result.error is an `Error` because result.isErr() was true
+    console.error(result.error.message);
 } else {
-    // Typescript knows that result.val is a number because result.err was false
-    let number = result.val + 1;
+    // Typescript knows that result.value is a number because result.isErr() was false
+    let number = result.value + 1;
 }
 ```
 
@@ -275,8 +282,8 @@ badResult.mapOr(0, (value) => -value) // 0
 
 // mapOrElse() is useful when you only want to call the default function
 // when it's necessary (if it performs some heavy computation for example).
-goodResult.mapOrElse(() => 0, (value) => -value) // -1
-badResult.mapOrElse(() => 0, (value) => -value) // 0
+goodResult.mapOrElse((_error) => 0, (value) => -value) // -1
+badResult.mapOrElse((_error) => 0, (value) => -value) // 0
 ```
 
 #### Or and OrElse
@@ -291,8 +298,8 @@ badResult.or(Ok(2)) // 2
 // orElse() is useful when you only want to call a function to get the
 // value when it's necessary (if it performs some heavy computation
 // for example).
-goodResult.orElse(() => Ok(2)) // 1, the function is *not* called.
-badResult.orElse(() => Ok(2)) // 2
+goodResult.orElse((_error) => Ok(2)) // 1, the function is *not* called.
+badResult.orElse((_error) => Ok(2)) // 2
 ```
 
 #### andThen
@@ -395,10 +402,10 @@ const greaterThanZero = obs$.pipe(
 ); // Has type Observable<Result<boolean, 'uh oh'>>
 
 greaterThanZero.subscribe((result) => {
-    if (result.ok) {
-        console.log('Was greater than zero: ' + result.val);
+    if (result.isOk()) {
+        console.log('Was greater than zero: ' + result.value);
     } else {
-        console.log('Got Error Message: ' + result.val);
+        console.log('Got Error Message: ' + result.error);
     }
 });
 
@@ -501,10 +508,10 @@ const test$ = obs$.pipe(
 ); // Has type Observable<Result<string, CustomError | Error>>
 
 test$.subscribe((result) => {
-    if (result.ok) {
-        console.log('Got string: ' + result.val);
+    if (result.isOk()) {
+        console.log('Got string: ' + result.value);
     } else {
-        console.log('Got error: ' + result.val.message);
+        console.log('Got error: ' + result.error.message);
     }
 });
 

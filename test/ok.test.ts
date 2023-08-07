@@ -27,19 +27,17 @@ test('Constructable & Callable', () => {
 
 test('ok, err, and val', () => {
     const err = new Ok(32);
-    expect(err.err).toBe(false);
-    assert<typeof err.err>(false);
+    expect(err.isErr()).toBe(false);
 
-    expect(err.ok).toBe(true);
-    assert<typeof err.ok>(true);
+    expect(err.isOk()).toBe(true);
 
-    expect(err.val).toBe(32);
-    eq<typeof err.val, number>(true);
+    expect(err.value).toBe(32);
+    eq<typeof err.value, number>(true);
 });
 
 test('static EMPTY', () => {
     expect(Ok.EMPTY).toBeInstanceOf(Ok);
-    expect(Ok.EMPTY.val).toBe(undefined);
+    expect(Ok.EMPTY.value).toBe(undefined);
     eq<typeof Ok.EMPTY, Ok<void>>(true);
 });
 
@@ -108,7 +106,7 @@ test('mapErr', () => {
 
 test('mapOr / mapOrElse', () => {
     expect(Ok(11).mapOr(1, (val) => val * 2)).toEqual(22)
-    expect(Ok(11).mapOrElse(() => 1, (val) => val * 2)).toEqual(22)
+    expect(Ok(11).mapOrElse((_error) => 1, (val) => val * 2)).toEqual(22)
 });
 
 test('iterable', () => {

@@ -11,8 +11,11 @@ import { Option, None, Some } from './option.js';
  * pub fn unwrap_or_default(self) -> T
  */
 interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : never> {
-    /** `true` when the result is Ok */ readonly ok: boolean;
-    /** `true` when the result is Err */ readonly err: boolean;
+    /** `true` when the result is Ok */
+    isOk(): this is OkImpl<T>
+
+    /** `true` when the result is Err */
+    isErr(): this is ErrImpl<E>
 
     /**
      * Returns the contained `Ok` value, if exists.  Throws an error if not.
@@ -117,7 +120,7 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * (in case of `Ok`) or producing a default value using the `default` function (in case of
      * `Err`).
      */
-    mapOrElse<U>(default_: () => U, mapper: (val: T) => U): U;
+    mapOrElse<U>(default_: (error: E) => U, mapper: (val: T) => U): U;
 
     /**
      * Returns `Ok()` if we have a value, otherwise returns `other`.
@@ -136,14 +139,14 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * Returns `Some()` if we have a value, otherwise returns the result
      * of calling `other()`.
      * 
-     * `other()` is called *only* when needed.
+     * `other()` is called *only* when needed and is passed the error value in a parameter.
      * 
      * @example
      * 
      * Ok(1).orElse(() => Ok(2)) // => Ok(1)
      * Err('error').orElse(() => Ok(2)) // => Ok(2) 
      */
-    orElse<E2>(other: () => Result<T, E2>): Result<T, E2>
+    orElse<E2>(other: (error: E) => Result<T, E2>): Result<T, E2>
 
     /**
      *  Converts from `Result<T, E>` to `Option<T>`, discarding the error if any
@@ -160,9 +163,15 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     /** An empty Err */
     static readonly EMPTY = new ErrImpl<void>(undefined);
 
-    readonly ok!: false;
-    readonly err!: true;
-    readonly val!: E;
+    isOk(): this is OkImpl<never> {
+        return false
+    }
+
+    isErr(): this is ErrImpl<E> {
+        return true
+    }
+
+    readonly error!: E;
 
     private readonly _stack!: string;
 
@@ -179,9 +188,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
             return new ErrImpl(val);
         }
 
-        this.ok = false;
-        this.err = true;
-        this.val = val;
+        this.error = val;
 
         const stackLines = new Error().stack!.split('\n').slice(2);
         if (stackLines && stackLines.length > 0 && stackLines[0].includes('ErrImpl')) {
@@ -207,22 +214,22 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         // The cause casting required because of the current TS definition being overly restrictive
         // (the definition says it has to be an Error while it can be anything).
         // See https://github.com/microsoft/TypeScript/issues/45167
-        throw new Error(`${msg} - Error: ${toString(this.val)}\n${this._stack}`, { cause: this.val as any });
+        throw new Error(`${msg} - Error: ${toString(this.error)}\n${this._stack}`, { cause: this.error as any });
     }
 
     expectErr(_msg: string): E {
-        return this.val
+        return this.error
     }
 
     unwrap(): never {
         // The cause casting required because of the current TS definition being overly restrictive
         // (the definition says it has to be an Error while it can be anything).
         // See https://github.com/microsoft/TypeScript/issues/45167
-        throw new Error(`Tried to unwrap Error: ${toString(this.val)}\n${this._stack}`, { cause: this.val as any });
+        throw new Error(`Tried to unwrap Error: ${toString(this.error)}\n${this._stack}`, { cause: this.error as any });
     }
 
     unwrapErr(): E {
-        return this.val;
+        return this.error;
     }
 
     map(_mapper: unknown): Err<E> {
@@ -234,23 +241,23 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     mapErr<E2>(mapper: (err: E) => E2): Err<E2> {
-        return new Err(mapper(this.val));
+        return new Err(mapper(this.error));
     }
 
     mapOr<U>(default_: U, _mapper: unknown): U {
         return default_;
     }
 
-    mapOrElse<U>(default_: () => U, _mapper: unknown): U {
-        return default_();
+    mapOrElse<U>(default_: (error: E) => U, _mapper: unknown): U {
+        return default_(this.error);
     }
 
     or<T, E2>(other: Result<T, E2>): Result<T, E2> {
         return other;
     }
 
-    orElse<T, E2>(other: () => Result<T, E2>): Result<T, E2> {
-        return other();
+    orElse<T, E2>(other: (error: E) => Result<T, E2>): Result<T, E2> {
+        return other(this.error);
     }
 
     toOption(): Option<never> {
@@ -258,7 +265,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     toString(): string {
-        return `Err(${toString(this.val)})`;
+        return `Err(${toString(this.error)})`;
     }
 
     get stack(): string | undefined {
@@ -276,15 +283,21 @@ export type Err<E> = ErrImpl<E>;
 export class OkImpl<T> implements BaseResult<T, never> {
     static readonly EMPTY = new OkImpl<void>(undefined);
 
-    readonly ok!: true;
-    readonly err!: false;
-    readonly val!: T;
+    isOk(): this is OkImpl<T> {
+        return true
+    }
+
+    isErr(): this is ErrImpl<never> {
+        return false
+    }
+
+    readonly value!: T;
 
     /**
      * Helper function if you know you have an Ok<T> and T is iterable
      */
     [Symbol.iterator](): Iterator<T extends Iterable<infer U> ? U : never> {
-        const obj = Object(this.val) as Iterable<any>;
+        const obj = Object(this.value) as Iterable<any>;
 
         return Symbol.iterator in obj
             ? obj[Symbol.iterator]()
@@ -300,9 +313,7 @@ export class OkImpl<T> implements BaseResult<T, never> {
             return new OkImpl(val);
         }
 
-        this.ok = true;
-        this.err = false;
-        this.val = val;
+        this.value = val;
     }
 
     /**
@@ -310,15 +321,15 @@ export class OkImpl<T> implements BaseResult<T, never> {
      * @deprecated in favor of unwrapOr
      */
     else(_val: unknown): T {
-        return this.val;
+        return this.value;
     }
 
     unwrapOr(_val: unknown): T {
-        return this.val;
+        return this.value;
     }
 
     expect(_msg: string): T {
-        return this.val;
+        return this.value;
     }
 
     expectErr(msg: string): never {
@@ -326,25 +337,25 @@ export class OkImpl<T> implements BaseResult<T, never> {
     }
 
     unwrap(): T {
-        return this.val;
+        return this.value;
     }
 
     unwrapErr(): never {
         // The cause casting required because of the current TS definition being overly restrictive
         // (the definition says it has to be an Error while it can be anything).
         // See https://github.com/microsoft/TypeScript/issues/45167
-        throw new Error(`Tried to unwrap Ok: ${toString(this.val)}`, { cause: this.val as any });
+        throw new Error(`Tried to unwrap Ok: ${toString(this.value)}`, { cause: this.value as any });
     }
 
     map<T2>(mapper: (val: T) => T2): Ok<T2> {
-        return new Ok(mapper(this.val));
+        return new Ok(mapper(this.value));
     }
 
     andThen<T2>(mapper: (val: T) => Ok<T2>): Ok<T2>;
     andThen<E2>(mapper: (val: T) => Err<E2>): Result<T, E2>;
     andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E2>;
     andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E2> {
-        return mapper(this.val);
+        return mapper(this.value);
     }
 
     mapErr(_mapper: unknown): Ok<T> {
@@ -352,23 +363,23 @@ export class OkImpl<T> implements BaseResult<T, never> {
     }
 
     mapOr<U>(_default_: U, mapper: (val: T) => U): U {
-        return mapper(this.val);
+        return mapper(this.value);
     }
 
-    mapOrElse<U>(_default_: () => U, mapper: (val: T) => U): U {
-        return mapper(this.val);
+    mapOrElse<U>(_default_: (_error: never) => U, mapper: (val: T) => U): U {
+        return mapper(this.value);
     }
 
     or<E2>(_other: Result<T, E2>): Result<T, E2> {
         return this;
     }
 
-    orElse<E2>(_other: () => Result<T, E2>): Result<T, E2> {
+    orElse<E2>(_other: (error: never) => Result<T, E2>): Result<T, E2> {
         return this;
     }
 
     toOption(): Option<T> {
-        return Some(this.val);
+        return Some(this.value);
     }
 
     /**
@@ -381,11 +392,11 @@ export class OkImpl<T> implements BaseResult<T, never> {
      * (this is the `into_ok()` in rust)
      */
     safeUnwrap(): T {
-        return this.val;
+        return this.value;
     }
 
     toString(): string {
-        return `Ok(${toString(this.val)})`;
+        return `Ok(${toString(this.value)})`;
     }
 }
 
@@ -415,8 +426,8 @@ export namespace Result {
     ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]> {
         const okResult = [];
         for (let result of results) {
-            if (result.ok) {
-                okResult.push(result.val);
+            if (result.isOk()) {
+                okResult.push(result.value);
             } else {
                 return result as Err<ResultErrTypes<T>[number]>;
             }
@@ -436,10 +447,10 @@ export namespace Result {
 
         // short-circuits
         for (const result of results) {
-            if (result.ok) {
+            if (result.isOk()) {
                 return result as Ok<ResultOkTypes<T>[number]>;
             } else {
-                errResult.push(result.val);
+                errResult.push(result.error);
             }
         }
 

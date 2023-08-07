@@ -20,7 +20,7 @@ Notable changes compared to the original package:
   `expectErr()`, `or()`, `orElse()`
 * `Ok` and `Err` no longer have the `val` property – it's `Ok.value` and `Err.error` now
 * There is `Some.value` which replaced `Some.val`
-* Boolean frags were replaced with methods:
+* Boolean flags were replaced with methods:
   * `Option.some` -> `Option.isSome()`
   * `Option.none` -> `Option.isNone()`
   * `Result.ok` -> `Result.isOk()`

@@ -26,6 +26,7 @@ Construction:
 
 .. code-block:: typescript
 
+    // The actual signature is more complicated but this should be good enough.
     static all(...results: Result<T, E>): Result<T[], E>
 
 Parse a set of ``Result``, returning an array of all ``Ok`` values.
@@ -81,6 +82,7 @@ Example:
 
 .. code-block:: typescript
 
+    // The actual signature is more complicated but this should be good enough.
     static any(...results: Result<T, E>): Result<T, E[]>
 
 Parse a set of ``Result``, short-circuits when an input value is ``Ok``.

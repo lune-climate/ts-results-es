@@ -50,7 +50,7 @@ added with not too much effort:
 
     andThen<T2, E2>(
         mapper: (val: T) => Result<T2, E2> | Promise<Result<T2, E2>> | AsyncResult<T2, E2>
-    ): AsyncResult<T | T2, E | E2>
+    ): AsyncResult<T2, E | E2>
 
 Calls ``mapper`` if the result is ``Ok``, otherwise keeps the ``Err`` value intact.
 This function can be used for control flow based on ``Result`` values.

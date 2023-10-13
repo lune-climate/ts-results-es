@@ -42,7 +42,7 @@ export class AsyncResult<T, E> {
      * await badResult.andThen(async (value) => Ok(value * 2)).promise // Err('boo')
      * ```
      */
-    andThen<T2, E2>(mapper: (val: T) => Result<T2, E2> | Promise<Result<T2, E2>> | AsyncResult<T2, E2>): AsyncResult<T | T2, E | E2> {
+    andThen<T2, E2>(mapper: (val: T) => Result<T2, E2> | Promise<Result<T2, E2>> | AsyncResult<T2, E2>): AsyncResult<T2, E | E2> {
         return this.thenInternal(async (result) => {
             if (result.isErr()) {
                 // SAFETY: What we're returning here is Err<E>. That doesn't sit well with

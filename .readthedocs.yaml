@@ -12,7 +12,7 @@ build:
   # https://docs.readthedocs.io/en/stable/build-customization.html#install-dependencies-with-poetry
   jobs:
     post_create_environment:
-      - pip install poetry
+      - pip install "poetry<1.8"
       # Tell poetry to not use a virtual environment – no need
       - poetry config virtualenvs.create false
     post_install:

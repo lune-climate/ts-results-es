@@ -58,6 +58,46 @@ Example:
     await goodResult.andThen(async (value) => Err(`${value} is bad`)).promise // Err('1 is bad')
     await badResult.andThen(async (value) => Ok(value * 2)).promise // Err('boo')
 
+
+``map()``
+---------
+
+.. code-block:: typescript
+
+    map<U>(mapper: (val: T) => U | Promise<U>): AsyncResult<U, E>
+
+Maps an ``AsyncResult<T, E>`` to ``AsyncResult<U, E>`` by applying a function to a contained
+``Ok`` value, leaving an ``Err`` value untouched.
+
+This function can be used to compose the results of two functions.
+
+Example:
+
+.. code-block:: typescript
+
+    let goodResult = Ok(1).toAsyncResult()
+    let badResult = Err('boo').toAsyncResult()
+
+    await goodResult.map(async (value) => value * 2).promise // Ok(2)
+    await badResult.andThen(async (value) => value * 2).promise // Err('boo')
+
+``mapErr()``
+------------
+
+Maps an ``AsyncResult<T, E>`` to ``AsyncResult<T, F>`` by applying ``mapper`` to the ``Err`` value, 
+leaving ``Ok`` value untouched.
+
+Example:
+
+.. code-block:: typescript
+
+    let goodResult = Ok(1).toAsyncResult()
+    let badResult = Err('boo').toAsyncResult()
+
+    await goodResult.mapErr(async (error) => `Error is ${error}`).promise // Ok(1)
+    await badResult.mapErr(async (error) => `Error is ${error}`).promise // Err('Error is boo')
+
+
 ``or()``
 --------
 
@@ -105,45 +145,6 @@ Example:
 
     await badResult.orElse(() => Ok(123)).promise // Ok(123)
     await goodResult.orElse(() => Ok(123)).promise // Ok(1)
-
-
-``map()``
----------
-
-.. code-block:: typescript
-
-    map<U>(mapper: (val: T) => U | Promise<U>): AsyncResult<U, E>
-
-Maps an ``AsyncResult<T, E>`` to ``AsyncResult<U, E>`` by applying a function to a contained
-``Ok`` value, leaving an ``Err`` value untouched.
-
-This function can be used to compose the results of two functions.
-
-Example:
-
-.. code-block:: typescript
-
-    let goodResult = Ok(1).toAsyncResult()
-    let badResult = Err('boo').toAsyncResult()
-
-    await goodResult.map(async (value) => value * 2).promise // Ok(2)
-    await badResult.andThen(async (value) => value * 2).promise // Err('boo')
-
-``mapErr()``
-------------
-
-Maps an ``AsyncResult<T, E>`` to ``AsyncResult<T, F>`` by applying ``mapper`` to the ``Err`` value, 
-leaving ``Ok`` value untouched.
-
-Example:
-
-.. code-block:: typescript
-
-    let goodResult = Ok(1).toAsyncResult()
-    let badResult = Err('boo').toAsyncResult()
-
-    await goodResult.mapErr(async (error) => `Error is ${error}`).promise // Ok(1)
-    await badResult.mapErr(async (error) => `Error is ${error}`).promise // Err('Error is boo')
 
 
 ``promise``

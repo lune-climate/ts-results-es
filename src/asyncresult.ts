@@ -1,3 +1,4 @@
+import { AsyncOption } from './asyncoption.js'
 import { Err, Result, Ok } from './result.js'
 
 /**
@@ -157,6 +158,14 @@ export class AsyncResult<T, E> {
             const otherValue = other(result.error)
             return otherValue instanceof AsyncResult ? otherValue.promise : otherValue
         })
+    }
+
+    /**
+     * Converts from `AsyncResult<T, E>` to `AsyncOption<T>` so that `Err` is converted to `None`
+     * and `Ok` is converted to `Some`.
+     */
+    toOption(): AsyncOption<T> {
+        return new AsyncOption(this.promise.then(result => result.toOption()))
     }
 
     private thenInternal<T2, E2>(mapper: (result: Result<T, E>) => Promise<Result<T2, E2>>): AsyncResult<T2, E2> {

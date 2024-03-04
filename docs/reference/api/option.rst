@@ -142,6 +142,20 @@ Example:
     Some(1).orElse(() => Some(2)) // => Some(1)
     None.orElse(() => Some(2)) // => Some(2) 
 
+.. _toAsyncOption:
+
+``toAsyncOption()``
+-------------------
+
+.. code-block:: typescript
+
+    toAsyncOption(): AsyncOption<T>
+
+Creates an `AsyncOption` based on this `Option`.
+
+Useful when you need to compose results with asynchronous code.
+
+
 ``toResult()``
 --------------
 

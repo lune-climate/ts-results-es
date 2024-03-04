@@ -12,6 +12,7 @@ API reference
 
     option
     result
+    asyncoption
     asyncresult
     rxjs
 

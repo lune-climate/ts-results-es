@@ -161,3 +161,14 @@ Example:
 A promise that resolves to a synchronous result.
 
 Await it to convert ``AsyncResult<T, E>`` to ``Result<T, E>``.
+
+
+``toOption()``
+--------------
+
+.. code-block:: typescript
+
+    toOption(): AsyncOption<T>
+
+Converts from ``AsyncResult<T, E>`` to ``AsyncOption<T>`` so that ``Err`` is converted to ``None``
+and ``Ok`` is converted to ``Some``.

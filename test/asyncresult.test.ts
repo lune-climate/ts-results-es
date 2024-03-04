@@ -2,6 +2,7 @@ import {
     AsyncResult,
     Err,
     Ok,
+    Some,
 } from '../src/index.js';
 
 test('andThen() should work', async () => {
@@ -61,4 +62,9 @@ test('orElse() should work', async () => {
     expect(await badResult.orElse(() => Ok(200)).promise).toEqual(Ok(200))
     expect(await badResult.orElse(() => new AsyncResult(Ok(200))).promise).toEqual(Ok(200))
     expect(await badResult.orElse(() => Promise.resolve(Ok(200))).promise).toEqual(Ok(200))
+})
+
+test('toOption() should work', async () => {
+    const result = new AsyncResult(Ok(1))
+    expect(await result.toOption().promise).toEqual(Some(1))
 })

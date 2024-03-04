@@ -1,3 +1,4 @@
+import { AsyncOption } from './asyncoption.js'
 import { toString } from './utils.js';
 import { Result, Ok, Err } from './result.js';
 
@@ -100,6 +101,13 @@ interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never
      * Maps an `Option<T>` to a `Result<T, E>`.
      */
     toResult<E>(error: E): Result<T, E>;
+
+    /**
+     * Creates an `AsyncOption` based on this `Option`.
+     *
+     * Useful when you need to compose results with asynchronous code.
+     */
+    toAsyncOption(): AsyncOption<T>
 }
 
 /**
@@ -164,6 +172,10 @@ class NoneImpl implements BaseOption<never> {
 
     toString(): string {
         return 'None';
+    }
+
+    toAsyncOption(): AsyncOption<never> {
+        return new AsyncOption<never>(None)
     }
 }
 
@@ -249,6 +261,10 @@ class SomeImpl<T> implements BaseOption<T> {
 
     toResult<E>(error: E): Ok<T> {
         return Ok(this.value);
+    }
+
+    toAsyncOption(): AsyncOption<T> {
+        return new AsyncOption(this)
     }
 
     /**

@@ -1,8 +1,10 @@
-# 4.1.0-alpha.1
+# 4.1.0
 
 - A whole bunch of documentation changes
 - Introduced `AsyncResult` to allow composing results with asynchronous code
-  (two composition methods implemented: `andThen()` and `map()`)
+- Introduced `AsyncOption` as well
+- Fixed `Option.any` behavior
+- Fixed an edge case in using `ts-results-es` in CommonJS projects
 
 # 4.0.0
 

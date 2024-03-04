@@ -34,11 +34,6 @@ Or you can use the :ref:`Result.toAsyncResult() <toAsyncResult>` method:
 
     const result3 = Ok(1).toAsyncResult()
 
-Only the most important methods are currently implemented. The following methods can be
-added with not too much effort:
-
-* ``mapOr()``
-* ``mapOrElse()``
 
 ``andThen()``
 -------------

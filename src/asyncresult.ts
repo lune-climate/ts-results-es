@@ -83,8 +83,6 @@ export class AsyncResult<T, E> {
     // mapErr()
     // mapOr()
     // mapOrElse()
-    // or()
-    // orElse()
 
     // mapErr<F>(mapper: (val: E) => F | Promise<F>): AsyncResult<T, F> {
     //     return this.thenInternal(async (result) => {
@@ -107,19 +105,47 @@ export class AsyncResult<T, E> {
     //     return mapper(result.value)
     // }
 
-    // or<E2>(other: Result<T, E2> | AsyncResult<T, E2> | Promise<Result<T, E2>>): AsyncResult<T, E2> {
-    //     return this.orElse(() => other)
-    // }
+    /**
+     * Returns the value from `other` if this `AsyncResult` contains `Err`, otherwise returns self.
+     *
+     * If `other` is a result of a function call consider using `orElse` instead, it will
+     * only evaluate the function when needed.
+     *
+     * @example
+     * ```
+     * const badResult = new AsyncResult(Err('Error message'))
+     * const goodResult = new AsyncResult(Ok(1))
+     *
+     * await badResult.or(Ok(123)).promise // Ok(123)
+     * await goodResult.or(Ok(123)).promise // Ok(1)
+     * ```
+     */
+    or<E2>(other: Result<T, E2> | AsyncResult<T, E2> | Promise<Result<T, E2>>): AsyncResult<T, E2> {
+        return this.orElse(() => other)
+    }
 
-    // orElse<E2>(other: (error: E) => Result<T, E2> | AsyncResult<T, E2> | Promise<Result<T, E2>>): AsyncResult<T, E2> {
-    //     return this.thenInternal(async (result) => {
-    //         if (result.isOk()) {
-    //             return result
-    //         }
-    //         const otherValue = other(result.error)
-    //         return otherValue instanceof AsyncResult ? otherValue.promise : otherValue
-    //     })
-    // }
+    /**
+     * Returns the value obtained by calling `other` if this `AsyncResult` contains `Err`, otherwise
+     * returns self.
+     *
+     * @example
+     * ```
+     * const badResult = new AsyncResult(Err('Error message'))
+     * const goodResult = new AsyncResult(Ok(1))
+     *
+     * await badResult.orElse(() => Ok(123)).promise // Ok(123)
+     * await goodResult.orElse(() => Ok(123)).promise // Ok(1)
+     * ```
+     */
+    orElse<E2>(other: (error: E) => Result<T, E2> | AsyncResult<T, E2> | Promise<Result<T, E2>>): AsyncResult<T, E2> {
+        return this.thenInternal(async (result) => {
+            if (result.isOk()) {
+                return result
+            }
+            const otherValue = other(result.error)
+            return otherValue instanceof AsyncResult ? otherValue.promise : otherValue
+        })
+    }
 
     private thenInternal<T2, E2>(mapper: (result: Result<T, E>) => Promise<Result<T2, E2>>): AsyncResult<T2, E2> {
         return new AsyncResult(this.promise.then(mapper))

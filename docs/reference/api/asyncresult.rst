@@ -40,8 +40,6 @@ added with not too much effort:
 * ``mapErr()``
 * ``mapOr()``
 * ``mapOrElse()``
-* ``or()``
-* ``orElse()``
 
 ``andThen()``
 -------------
@@ -65,6 +63,55 @@ Example:
     await goodResult.andThen(async (value) => Ok(value * 2)).promise // Ok(2)
     await goodResult.andThen(async (value) => Err(`${value} is bad`)).promise // Err('1 is bad')
     await badResult.andThen(async (value) => Ok(value * 2)).promise // Err('boo')
+
+``or()``
+--------
+
+.. code-block:: typescript
+
+    or<E2>(other: Result<T, E2> | AsyncResult<T, E2> | Promise<Result<T, E2>>): AsyncResult<T, E2>
+
+Returns the value from ``other`` if this ``AsyncResult`` contains ``Err``, otherwise returns self.
+
+If ``other`` is a result of a function call consider using :ref:`AsyncResult.orElse` instead, it will
+only evaluate the function when needed.
+
+Example:
+
+.. code-block:: typescript
+
+    const badResult = new AsyncResult(Err('Error message'))
+    const goodResult = new AsyncResult(Ok(1))
+
+    await badResult.or(Ok(123)).promise // Ok(123)
+    await goodResult.or(Ok(123)).promise // Ok(1)
+
+
+.. _AsyncResult.orElse:
+
+``orElse()``
+------------
+
+.. code-block:: typescript
+
+    orElse<E2>(
+        other: (error: E) => Result<T, E2> | AsyncResult<T, E2> | Promise<Result<T, E2>>,
+    ): AsyncResult<T, E2>
+
+
+Returns the value obtained by calling ``other`` if this ``AsyncResult`` contains ``Err``, otherwise
+returns self.
+
+Example:
+
+.. code-block:: typescript
+
+    const badResult = new AsyncResult(Err('Error message'))
+    const goodResult = new AsyncResult(Ok(1))
+
+    await badResult.orElse(() => Ok(123)).promise // Ok(123)
+    await goodResult.orElse(() => Ok(123)).promise // Ok(1)
+
 
 ``map()``
 ---------

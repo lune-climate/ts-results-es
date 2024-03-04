@@ -84,6 +84,10 @@ Example:
 ``mapErr()``
 ------------
 
+.. code-block:: typescript
+
+    mapErr<F>(mapper: (val: E) => F | Promise<F>): AsyncResult<T, F>
+
 Maps an ``AsyncResult<T, E>`` to ``AsyncResult<T, F>`` by applying ``mapper`` to the ``Err`` value, 
 leaving ``Ok`` value untouched.
 

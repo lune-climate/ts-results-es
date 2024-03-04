@@ -1,5 +1,6 @@
 # ts-results-es
 
+
 A typescript implementation of Rust's [Result](https://doc.rust-lang.org/std/result/)
 and [Option](https://doc.rust-lang.org/std/option/) objects.
 

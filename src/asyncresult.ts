@@ -79,9 +79,6 @@ export class AsyncResult<T, E> {
         })
     }
 
-    // TODO:
-    // mapOr()
-    // mapOrElse()
 
     /**
      * Maps an `AsyncResult<T, E>` to `AsyncResult<T, F>` by applying `mapper` to the `Err` value, 
@@ -104,18 +101,6 @@ export class AsyncResult<T, E> {
             return Err(await mapper(result.error))
         })
     }
-
-    // async mapOr<U>(default_: U, mapper: (val: T) => U | Promise<U>): Promise<U> {
-    //     return this.mapOrElse(() => default_, mapper)
-    // }
-
-    // async mapOrElse<U>(default_: (error: E) => U | Promise<U>, mapper: (val: T) => U | Promise<U>): Promise<U> {
-    //     const result = await this.promise
-    //     if (result.isErr()) {
-    //         return default_(result.error)
-    //     }
-    //     return mapper(result.value)
-    // }
 
     /**
      * Returns the value from `other` if this `AsyncResult` contains `Err`, otherwise returns self.

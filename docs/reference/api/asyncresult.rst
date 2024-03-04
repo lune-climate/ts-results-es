@@ -37,7 +37,6 @@ Or you can use the :ref:`Result.toAsyncResult() <toAsyncResult>` method:
 Only the most important methods are currently implemented. The following methods can be
 added with not too much effort:
 
-* ``mapErr()``
 * ``mapOr()``
 * ``mapOrElse()``
 
@@ -134,6 +133,23 @@ Example:
 
     await goodResult.map(async (value) => value * 2).promise // Ok(2)
     await badResult.andThen(async (value) => value * 2).promise // Err('boo')
+
+``mapErr()``
+------------
+
+Maps an ``AsyncResult<T, E>`` to ``AsyncResult<T, F>`` by applying ``mapper`` to the ``Err`` value, 
+leaving ``Ok`` value untouched.
+
+Example:
+
+.. code-block:: typescript
+
+    let goodResult = Ok(1).toAsyncResult()
+    let badResult = Err('boo').toAsyncResult()
+
+    await goodResult.mapErr(async (error) => `Error is ${error}`).promise // Ok(1)
+    await badResult.mapErr(async (error) => `Error is ${error}`).promise // Err('Error is boo')
+
 
 ``promise``
 -----------

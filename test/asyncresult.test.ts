@@ -23,6 +23,17 @@ test('map() should work', async () => {
     expect(await goodResult.map((value) => Promise.resolve(value * 2)).promise).toEqual(Ok(200))
 })
 
+test('mapErr() should work', async () => {
+    const err = Err('Boo')
+    const badResult = new AsyncResult(err)
+    const goodResult = new AsyncResult(Ok(100))
+
+    expect(await goodResult.mapErr(_error => {throw new Error('Should not be called')}).promise).toEqual(Ok(100))
+
+    expect((await badResult.mapErr(error => `Error is ${error}`).promise).unwrapErr()).toEqual('Error is Boo')
+    expect((await badResult.mapErr(async error => `Error is ${error}`).promise).unwrapErr()).toEqual('Error is Boo')
+})
+
 test('or() should work', async () => {
     const err = Err('Boo')
     const badResult = new AsyncResult(err)

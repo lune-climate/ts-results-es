@@ -80,18 +80,30 @@ export class AsyncResult<T, E> {
     }
 
     // TODO:
-    // mapErr()
     // mapOr()
     // mapOrElse()
 
-    // mapErr<F>(mapper: (val: E) => F | Promise<F>): AsyncResult<T, F> {
-    //     return this.thenInternal(async (result) => {
-    //         if (result.isOk()) {
-    //             return result
-    //         }
-    //         return Err(await mapper(result.error))
-    //     })
-    // }
+    /**
+     * Maps an `AsyncResult<T, E>` to `AsyncResult<T, F>` by applying `mapper` to the `Err` value, 
+     * leaving `Ok` value untouched.
+     * 
+     * @example
+     * ```typescript
+     * let goodResult = Ok(1).toAsyncResult()
+     * let badResult = Err('boo').toAsyncResult()
+     *
+     * await goodResult.mapErr(async (error) => `Error is ${error}`).promise // Ok(1)
+     * await badResult.mapErr(async (error) => `Error is ${error}`).promise // Err('Error is boo')
+     * ```
+    */
+    mapErr<F>(mapper: (val: E) => F | Promise<F>): AsyncResult<T, F> {
+        return this.thenInternal(async (result) => {
+            if (result.isOk()) {
+                return result
+            }
+            return Err(await mapper(result.error))
+        })
+    }
 
     // async mapOr<U>(default_: U, mapper: (val: T) => U | Promise<U>): Promise<U> {
     //     return this.mapOrElse(() => default_, mapper)

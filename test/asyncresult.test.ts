@@ -22,3 +22,32 @@ test('map() should work', async () => {
     expect(await badResult.map(() => {throw new Error('Should not be called')}).promise).toEqual(err)
     expect(await goodResult.map((value) => Promise.resolve(value * 2)).promise).toEqual(Ok(200))
 })
+
+test('or() should work', async () => {
+    const err = Err('Boo')
+    const badResult = new AsyncResult(err)
+    const goodResult = new AsyncResult(Ok(100))
+
+    expect(await badResult.or(Ok(200)).promise).toEqual(Ok(200))
+    expect(await goodResult.or(Ok(200)).promise).toEqual(Ok(100))
+
+    expect(await badResult.or(new AsyncResult(Ok(200))).promise).toEqual(Ok(200))
+    expect(await goodResult.or(new AsyncResult(Ok(200))).promise).toEqual(Ok(100))
+
+    expect(await badResult.or(Promise.resolve(Ok(200))).promise).toEqual(Ok(200))
+    expect(await goodResult.or(Promise.resolve(Ok(200))).promise).toEqual(Ok(100))
+})
+
+test('orElse() should work', async () => {
+    const err = Err('Boo')
+    const badResult = new AsyncResult(err)
+    const goodResult = new AsyncResult(Ok(100))
+    function notExpectedToBeCalled(): never {
+        throw new Error('Not expected to be called')
+    }
+
+    expect(await goodResult.orElse(notExpectedToBeCalled).promise).toEqual(Ok(100))
+    expect(await badResult.orElse(() => Ok(200)).promise).toEqual(Ok(200))
+    expect(await badResult.orElse(() => new AsyncResult(Ok(200))).promise).toEqual(Ok(200))
+    expect(await badResult.orElse(() => Promise.resolve(Ok(200))).promise).toEqual(Ok(200))
+})

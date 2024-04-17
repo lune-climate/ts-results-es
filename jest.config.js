@@ -2,11 +2,6 @@ module.exports = {
     preset: 'ts-jest',
     testEnvironment: 'node',
     testRegex: '/test/.*.test.ts',
-    globals: {
-        'ts-jest': {
-            tsconfig: 'test/tsconfig.json',
-        },
-    },
     collectCoverageFrom: ['src/**/*.ts'],
     collectCoverage: true,
     coverageThreshold: {
@@ -16,6 +11,11 @@ module.exports = {
             lines: 100,
             statements: 100,
         },
+    },
+    transform: {
+        '^.*\.ts$': ['ts-jest', {
+            tsconfig: 'test/tsconfig.json'
+        }]
     },
     moduleNameMapper: {
       "^(.*)\\.js$": "$1"

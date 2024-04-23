@@ -31,6 +31,7 @@ to combine results with asynchronouse code.
 
     // The actual signature is more complicated but this should be good enough.
     static all(...results: Result<T, E>): Result<T[], E>
+    static all(results: Result<T, E>[]): Result<T[], E>
 
 Parse a set of ``Result``, returning an array of all ``Ok`` values.
 Short circuits with the first ``Err`` found, if any.
@@ -45,6 +46,18 @@ Example:
     let result = Result.all(pizzaResult, toppingsResult); // Result<[Pizza, Toppings], GetPizzaError | GetToppingsError>
 
     let [pizza, toppings] = result.unwrap(); // pizza is a Pizza, toppings is a Toppings.  Could throw GetPizzaError or GetToppingsError.
+
+When working with a set of results of unknown size, you can use the array version of ``all()``.
+
+Example:
+
+.. code-block:: typescript
+
+    let results: Result<Topping, GetToppingsError>[] = pizzaToppingNames.map(name => getPizzaToppingByName(name));
+
+    let result = Result.all(results); // Result<Topping[], GetToppingsError>
+
+    let toppings = result.unwrap(); // toppings is an array of Topping.  Could throw GetToppingsError.
 
 ``andThen()``
 -------------
@@ -87,6 +100,7 @@ Example:
 
     // The actual signature is more complicated but this should be good enough.
     static any(...results: Result<T, E>): Result<T, E[]>
+    static any(results: Result<T, E>[]): Result<T, E[]>
 
 Parse a set of ``Result``, short-circuits when an input value is ``Ok``.
 If no ``Ok`` is found, returns an ``Err`` containing the collected error values.
@@ -102,6 +116,18 @@ Example:
     let result = Result.any(url1, url2, url3); // Result<string, Error1 | Error2 | Error3>
 
     let url = result.unwrap(); // At least one attempt gave us a successful url
+
+When working with a set of results of unknown size, you can use the array version of ``any()``.
+
+Example:
+
+.. code-block:: typescript
+
+    let connections: Array<Result<string, Error1 | Error2 | Error3 | ...>> = [attempt1(), attempt2(), attempt3(), ...];
+
+    let results = Result.any(connections); // Result<string, Error1 | Error2 | Error3 | ...>
+
+    let url = results.unwrap(); // At least one attempt gave us a successful url
 
 ``error``
 ---------

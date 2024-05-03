@@ -1,16 +1,15 @@
-import {
-    AsyncResult,
-    Err,
-    Ok,
-    Some,
-} from '../src/index.js';
+import { AsyncResult, Err, Ok, Some } from '../src/index.js'
 
 test('andThen() should work', async () => {
     const err = Err('error')
     const badResult = new AsyncResult(err)
     const goodResult = new AsyncResult(Ok(100))
 
-    expect(await badResult.andThen(() => {throw new Error('Should not be called')}).promise).toEqual(err)
+    expect(
+        await badResult.andThen(() => {
+            throw new Error('Should not be called')
+        }).promise,
+    ).toEqual(err)
     expect(await goodResult.andThen((value) => Promise.resolve(Ok(value * 2))).promise).toEqual(Ok(200))
     expect(await goodResult.andThen((value) => Ok(value * 3).toAsyncResult()).promise).toEqual(Ok(300))
 })
@@ -20,7 +19,11 @@ test('map() should work', async () => {
     const badResult = new AsyncResult(err)
     const goodResult = new AsyncResult(Ok(100))
 
-    expect(await badResult.map(() => {throw new Error('Should not be called')}).promise).toEqual(err)
+    expect(
+        await badResult.map(() => {
+            throw new Error('Should not be called')
+        }).promise,
+    ).toEqual(err)
     expect(await goodResult.map((value) => Promise.resolve(value * 2)).promise).toEqual(Ok(200))
 })
 
@@ -29,10 +32,14 @@ test('mapErr() should work', async () => {
     const badResult = new AsyncResult(err)
     const goodResult = new AsyncResult(Ok(100))
 
-    expect(await goodResult.mapErr(_error => {throw new Error('Should not be called')}).promise).toEqual(Ok(100))
+    expect(
+        await goodResult.mapErr((_error) => {
+            throw new Error('Should not be called')
+        }).promise,
+    ).toEqual(Ok(100))
 
-    expect((await badResult.mapErr(error => `Error is ${error}`).promise).unwrapErr()).toEqual('Error is Boo')
-    expect((await badResult.mapErr(async error => `Error is ${error}`).promise).unwrapErr()).toEqual('Error is Boo')
+    expect((await badResult.mapErr((error) => `Error is ${error}`).promise).unwrapErr()).toEqual('Error is Boo')
+    expect((await badResult.mapErr(async (error) => `Error is ${error}`).promise).unwrapErr()).toEqual('Error is Boo')
 })
 
 test('or() should work', async () => {

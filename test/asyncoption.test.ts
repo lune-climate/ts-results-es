@@ -1,8 +1,4 @@
-import {
-    AsyncOption,
-    None,
-    Some,
-} from '../src/index.js';
+import { AsyncOption, None, Some } from '../src/index.js'
 
 test('the constructor should work', async () => {
     const option = new AsyncOption(Some(1))
@@ -13,7 +9,11 @@ test('andThen() should work', async () => {
     const noValue = new AsyncOption(None)
     const hasValue = new AsyncOption(Some(1))
 
-    expect(await noValue.andThen(() => {throw new Error('Should not be called')}).promise).toEqual(None)
+    expect(
+        await noValue.andThen(() => {
+            throw new Error('Should not be called')
+        }).promise,
+    ).toEqual(None)
 
     expect(await hasValue.andThen((value) => Some(value * 3)).promise).toEqual(Some(3))
     expect(await hasValue.andThen(async (value) => Some(value * 3)).promise).toEqual(Some(3))
@@ -24,7 +24,11 @@ test('map() should work', async () => {
     const noValue = new AsyncOption(None)
     const hasValue = new AsyncOption(Some(1))
 
-    expect(await noValue.map(() => {throw new Error('Should not be called')}).promise).toEqual(None)
+    expect(
+        await noValue.map(() => {
+            throw new Error('Should not be called')
+        }).promise,
+    ).toEqual(None)
     expect(await hasValue.map((value) => value * 2).promise).toEqual(Some(2))
     expect(await hasValue.map(async (value) => value * 2).promise).toEqual(Some(2))
 })

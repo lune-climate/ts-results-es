@@ -43,7 +43,9 @@ export class AsyncResult<T, E> {
      * await badResult.andThen(async (value) => Ok(value * 2)).promise // Err('boo')
      * ```
      */
-    andThen<T2, E2>(mapper: (val: T) => Result<T2, E2> | Promise<Result<T2, E2>> | AsyncResult<T2, E2>): AsyncResult<T2, E | E2> {
+    andThen<T2, E2>(
+        mapper: (val: T) => Result<T2, E2> | Promise<Result<T2, E2>> | AsyncResult<T2, E2>,
+    ): AsyncResult<T2, E | E2> {
         return this.thenInternal(async (result) => {
             if (result.isErr()) {
                 // SAFETY: What we're returning here is Err<E>. That doesn't sit well with
@@ -80,11 +82,10 @@ export class AsyncResult<T, E> {
         })
     }
 
-
     /**
-     * Maps an `AsyncResult<T, E>` to `AsyncResult<T, F>` by applying `mapper` to the `Err` value, 
+     * Maps an `AsyncResult<T, E>` to `AsyncResult<T, F>` by applying `mapper` to the `Err` value,
      * leaving `Ok` value untouched.
-     * 
+     *
      * @example
      * ```typescript
      * let goodResult = Ok(1).toAsyncResult()
@@ -93,7 +94,7 @@ export class AsyncResult<T, E> {
      * await goodResult.mapErr(async (error) => `Error is ${error}`).promise // Ok(1)
      * await badResult.mapErr(async (error) => `Error is ${error}`).promise // Err('Error is boo')
      * ```
-    */
+     */
     mapErr<F>(mapper: (val: E) => F | Promise<F>): AsyncResult<T, F> {
         return this.thenInternal(async (result) => {
             if (result.isOk()) {
@@ -150,7 +151,7 @@ export class AsyncResult<T, E> {
      * and `Ok` is converted to `Some`.
      */
     toOption(): AsyncOption<T> {
-        return new AsyncOption(this.promise.then(result => result.toOption()))
+        return new AsyncOption(this.promise.then((result) => result.toOption()))
     }
 
     private thenInternal<T2, E2>(mapper: (result: Result<T, E>) => Promise<Result<T2, E2>>): AsyncResult<T2, E2> {

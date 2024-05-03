@@ -1,5 +1,5 @@
-import { AsyncOption } from './asyncoption.js'
-import { Err, Result, Ok } from './result.js'
+import { AsyncOption } from './asyncoption.js';
+import { Err, Result, Ok } from './result.js';
 
 /**
  * An async-aware `Result` counterpart.
@@ -15,7 +15,7 @@ export class AsyncResult<T, E> {
      *
      * Await it to convert `AsyncResult<T, E>` to `Result<T, E>`.
      */
-    promise: Promise<Result<T, E>>
+    promise: Promise<Result<T, E>>;
 
     /**
      * Constructs an `AsyncResult` from a `Result` or a `Promise` of a `Result`.
@@ -26,7 +26,7 @@ export class AsyncResult<T, E> {
      * ```
      */
     constructor(start: Result<T, E> | Promise<Result<T, E>>) {
-        this.promise = Promise.resolve(start)
+        this.promise = Promise.resolve(start);
     }
 
     /**
@@ -43,17 +43,19 @@ export class AsyncResult<T, E> {
      * await badResult.andThen(async (value) => Ok(value * 2)).promise // Err('boo')
      * ```
      */
-    andThen<T2, E2>(mapper: (val: T) => Result<T2, E2> | Promise<Result<T2, E2>> | AsyncResult<T2, E2>): AsyncResult<T2, E | E2> {
+    andThen<T2, E2>(
+        mapper: (val: T) => Result<T2, E2> | Promise<Result<T2, E2>> | AsyncResult<T2, E2>,
+    ): AsyncResult<T2, E | E2> {
         return this.thenInternal(async (result) => {
             if (result.isErr()) {
                 // SAFETY: What we're returning here is Err<E>. That doesn't sit well with
                 // TypeScript for some reason, let's explicitly expand the type to what this
                 // function is supposed to return.
-                return result as Err<E | E2>
+                return result as Err<E | E2>;
             }
-            const mapped = mapper(result.value)
-            return mapped instanceof AsyncResult ? mapped.promise : mapped
-        })
+            const mapped = mapper(result.value);
+            return mapped instanceof AsyncResult ? mapped.promise : mapped;
+        });
     }
 
     /**
@@ -74,17 +76,16 @@ export class AsyncResult<T, E> {
     map<U>(mapper: (val: T) => U | Promise<U>): AsyncResult<U, E> {
         return this.thenInternal(async (result) => {
             if (result.isErr()) {
-                return result
+                return result;
             }
-            return Ok(await mapper(result.value))
-        })
+            return Ok(await mapper(result.value));
+        });
     }
 
-
     /**
-     * Maps an `AsyncResult<T, E>` to `AsyncResult<T, F>` by applying `mapper` to the `Err` value, 
+     * Maps an `AsyncResult<T, E>` to `AsyncResult<T, F>` by applying `mapper` to the `Err` value,
      * leaving `Ok` value untouched.
-     * 
+     *
      * @example
      * ```typescript
      * let goodResult = Ok(1).toAsyncResult()
@@ -93,14 +94,14 @@ export class AsyncResult<T, E> {
      * await goodResult.mapErr(async (error) => `Error is ${error}`).promise // Ok(1)
      * await badResult.mapErr(async (error) => `Error is ${error}`).promise // Err('Error is boo')
      * ```
-    */
+     */
     mapErr<F>(mapper: (val: E) => F | Promise<F>): AsyncResult<T, F> {
         return this.thenInternal(async (result) => {
             if (result.isOk()) {
-                return result
+                return result;
             }
-            return Err(await mapper(result.error))
-        })
+            return Err(await mapper(result.error));
+        });
     }
 
     /**
@@ -119,7 +120,7 @@ export class AsyncResult<T, E> {
      * ```
      */
     or<E2>(other: Result<T, E2> | AsyncResult<T, E2> | Promise<Result<T, E2>>): AsyncResult<T, E2> {
-        return this.orElse(() => other)
+        return this.orElse(() => other);
     }
 
     /**
@@ -138,11 +139,11 @@ export class AsyncResult<T, E> {
     orElse<E2>(other: (error: E) => Result<T, E2> | AsyncResult<T, E2> | Promise<Result<T, E2>>): AsyncResult<T, E2> {
         return this.thenInternal(async (result) => {
             if (result.isOk()) {
-                return result
+                return result;
             }
-            const otherValue = other(result.error)
-            return otherValue instanceof AsyncResult ? otherValue.promise : otherValue
-        })
+            const otherValue = other(result.error);
+            return otherValue instanceof AsyncResult ? otherValue.promise : otherValue;
+        });
     }
 
     /**
@@ -150,10 +151,10 @@ export class AsyncResult<T, E> {
      * and `Ok` is converted to `Some`.
      */
     toOption(): AsyncOption<T> {
-        return new AsyncOption(this.promise.then(result => result.toOption()))
+        return new AsyncOption(this.promise.then((result) => result.toOption()));
     }
 
     private thenInternal<T2, E2>(mapper: (result: Result<T, E>) => Promise<Result<T2, E2>>): AsyncResult<T2, E2> {
-        return new AsyncResult(this.promise.then(mapper))
+        return new AsyncResult(this.promise.then(mapper));
     }
 }

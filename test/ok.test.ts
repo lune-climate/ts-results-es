@@ -74,11 +74,10 @@ test('unwrapErr', () => {
     try {
         const err = Ok('boom').unwrapErr();
         expect_never(err, true);
-        throw new Error('Unreachable')
-    }
-    catch (e) {
-        expect((e as Error).message).toMatch('boom')
-        expect((e as Error).cause).toEqual('boom')
+        throw new Error('Unreachable');
+    } catch (e) {
+        expect((e as Error).message).toMatch('boom');
+        expect((e as Error).cause).toEqual('boom');
     }
 });
 
@@ -105,8 +104,13 @@ test('mapErr', () => {
 });
 
 test('mapOr / mapOrElse', () => {
-    expect(Ok(11).mapOr(1, (val) => val * 2)).toEqual(22)
-    expect(Ok(11).mapOrElse((_error) => 1, (val) => val * 2)).toEqual(22)
+    expect(Ok(11).mapOr(1, (val) => val * 2)).toEqual(22);
+    expect(
+        Ok(11).mapOrElse(
+            (_error) => 1,
+            (val) => val * 2,
+        ),
+    ).toEqual(22);
 });
 
 test('iterable', () => {

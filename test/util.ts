@@ -23,8 +23,8 @@ declare global {
 expect.extend({
     toMatchResult(received: Result<any, any>, result: Result<any, any>) {
         let pass = true;
-        const receivedInner = 'value' in received ? received.value : received.error
-        const resultInner = 'value' in result ? result.value : result.error
+        const receivedInner = 'value' in received ? received.value : received.error;
+        const resultInner = 'value' in result ? result.value : result.error;
         try {
             expect(received.isOk()).toBe(result.isOk());
 
@@ -49,10 +49,13 @@ expect.extend({
         let pass = true;
 
         let received: Result<any, any> | undefined;
-        let receivedInner
-        const resultInner = 'value' in result ? result.value : result.error
+        let receivedInner;
+        const resultInner = 'value' in result ? result.value : result.error;
         try {
-            obs.subscribe((val) => {received = val; receivedInner = 'value' in received ? received.value : received.error}).unsubscribe();
+            obs.subscribe((val) => {
+                received = val;
+                receivedInner = 'value' in received ? received.value : received.error;
+            }).unsubscribe();
 
             expect(received?.isOk()).toBe(result.isOk());
 

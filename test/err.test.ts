@@ -54,11 +54,10 @@ test('expect', () => {
     try {
         const err = Err(true).expect('should fail!');
         expect_never(err, true);
-        throw new Error('Unreachable')
-    }
-    catch (e) {
-        expect((e as Error).message).toMatch('should fail!')
-        expect((e as Error).cause).toEqual(true)
+        throw new Error('Unreachable');
+    } catch (e) {
+        expect((e as Error).message).toMatch('should fail!');
+        expect((e as Error).cause).toEqual(true);
     }
 });
 
@@ -72,11 +71,10 @@ test('unwrap', () => {
     try {
         const err = Err({ message: 'bad error' }).unwrap();
         expect_never(err, true);
-        throw new Error('Unreachable')
-    }
-    catch (e) {
-        expect((e as Error).message).toMatch('{"message":"bad error"}')
-        expect((e as Error).cause).toEqual({ message: 'bad error' })
+        throw new Error('Unreachable');
+    } catch (e) {
+        expect((e as Error).message).toMatch('{"message":"bad error"}');
+        expect((e as Error).cause).toEqual({ message: 'bad error' });
     }
 });
 
@@ -105,8 +103,13 @@ test('mapErr', () => {
 });
 
 test('mapOr / mapOrElse', () => {
-    expect(Err('Some error').mapOr(1, () => -1)).toEqual(1)
-    expect(Err('Some error').mapOrElse((error) => error.length, () => -1)).toEqual(10)
+    expect(Err('Some error').mapOr(1, () => -1)).toEqual(1);
+    expect(
+        Err('Some error').mapOrElse(
+            (error) => error.length,
+            () => -1,
+        ),
+    ).toEqual(10);
 });
 
 test('iterable', () => {

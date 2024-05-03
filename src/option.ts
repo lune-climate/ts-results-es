@@ -1,13 +1,13 @@
-import { AsyncOption } from './asyncoption.js'
+import { AsyncOption } from './asyncoption.js';
 import { toString } from './utils.js';
 import { Result, Ok, Err } from './result.js';
 
 interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never> {
     /** `true` when the Option is Some */
-    isSome(): this is SomeImpl<T>
+    isSome(): this is SomeImpl<T>;
 
     /** `true` when the Option is None */
-    isNone(): this is None
+    isNone(): this is None;
 
     /**
      * Returns the contained `Some` value, if exists.  Throws an error if not.
@@ -73,29 +73,29 @@ interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never
 
     /**
      * Returns `Some()` if we have a value, otherwise returns `other`.
-     * 
+     *
      * `other` is evaluated eagerly. If `other` is a result of a function
      * call try `orElse()` instead – it evaluates the parameter lazily.
-     * 
+     *
      * @example
-     * 
+     *
      * Some(1).or(Some(2)) // => Some(1)
-     * None.or(Some(2)) // => Some(2) 
+     * None.or(Some(2)) // => Some(2)
      */
-    or(other: Option<T>): Option<T>
+    or(other: Option<T>): Option<T>;
 
     /**
      * Returns `Some()` if we have a value, otherwise returns the result
      * of calling `other()`.
-     * 
+     *
      * `other()` is called *only* when needed.
-     * 
+     *
      * @example
-     * 
+     *
      * Some(1).orElse(() => Some(2)) // => Some(1)
-     * None.orElse(() => Some(2)) // => Some(2) 
+     * None.orElse(() => Some(2)) // => Some(2)
      */
-    orElse(other: () => Option<T>): Option<T>
+    orElse(other: () => Option<T>): Option<T>;
 
     /**
      * Maps an `Option<T>` to a `Result<T, E>`.
@@ -107,7 +107,7 @@ interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never
      *
      * Useful when you need to compose results with asynchronous code.
      */
-    toAsyncOption(): AsyncOption<T>
+    toAsyncOption(): AsyncOption<T>;
 }
 
 /**
@@ -115,7 +115,7 @@ interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never
  */
 class NoneImpl implements BaseOption<never> {
     isSome(): this is SomeImpl<never> {
-        return false
+        return false;
     }
 
     isNone(): this is NoneImpl {
@@ -175,7 +175,7 @@ class NoneImpl implements BaseOption<never> {
     }
 
     toAsyncOption(): AsyncOption<never> {
-        return new AsyncOption<never>(None)
+        return new AsyncOption<never>(None);
     }
 }
 
@@ -191,7 +191,7 @@ class SomeImpl<T> implements BaseOption<T> {
     static readonly EMPTY = new SomeImpl<void>(undefined);
 
     isSome(): this is SomeImpl<T> {
-        return true
+        return true;
     }
 
     isNone(): this is NoneImpl {
@@ -264,7 +264,7 @@ class SomeImpl<T> implements BaseOption<T> {
     }
 
     toAsyncOption(): AsyncOption<T> {
-        return new AsyncOption(this)
+        return new AsyncOption(this);
     }
 
     /**

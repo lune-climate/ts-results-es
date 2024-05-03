@@ -1,5 +1,5 @@
-import { AsyncResult } from './asyncresult.js'
-import { Option, Some } from './option.js'
+import { AsyncResult } from './asyncresult.js';
+import { Option, Some } from './option.js';
 
 /**
  * An async-aware `Option` counterpart.
@@ -15,7 +15,7 @@ export class AsyncOption<T> {
      *
      * Await it to convert `AsyncOption<T>` to `Option<T>`.
      */
-    promise: Promise<Option<T>>
+    promise: Promise<Option<T>>;
 
     /**
      * Constructs an `AsyncOption` from an `Option` or a `Promise` of an `Option`.
@@ -26,7 +26,7 @@ export class AsyncOption<T> {
      * ```
      */
     constructor(start: Option<T> | Promise<Option<T>>) {
-        this.promise = Promise.resolve(start)
+        this.promise = Promise.resolve(start);
     }
 
     /**
@@ -46,11 +46,11 @@ export class AsyncOption<T> {
     andThen<T2>(mapper: (val: T) => Option<T2> | Promise<Option<T2>> | AsyncOption<T2>): AsyncOption<T2> {
         return this.thenInternal(async (option) => {
             if (option.isNone()) {
-                return option
+                return option;
             }
-            const mapped = mapper(option.value)
-            return mapped instanceof AsyncOption ? mapped.promise : mapped
-        })
+            const mapped = mapper(option.value);
+            return mapped instanceof AsyncOption ? mapped.promise : mapped;
+        });
     }
 
     /**
@@ -71,10 +71,10 @@ export class AsyncOption<T> {
     map<U>(mapper: (val: T) => U | Promise<U>): AsyncOption<U> {
         return this.thenInternal(async (option) => {
             if (option.isNone()) {
-                return option
+                return option;
             }
-            return Some(await mapper(option.value))
-        })
+            return Some(await mapper(option.value));
+        });
     }
 
     /**
@@ -93,7 +93,7 @@ export class AsyncOption<T> {
      * ```
      */
     or<U>(other: Option<U> | AsyncOption<U> | Promise<Option<U>>): AsyncOption<T | U> {
-        return this.orElse(() => other)
+        return this.orElse(() => other);
     }
 
     /**
@@ -110,13 +110,13 @@ export class AsyncOption<T> {
      * ```
      */
     orElse<U>(other: () => Option<U> | AsyncOption<U> | Promise<Option<U>>): AsyncOption<T | U> {
-        return this.thenInternal(async (option): Promise<Option<T | U>>  => {
+        return this.thenInternal(async (option): Promise<Option<T | U>> => {
             if (option.isSome()) {
-                return option
+                return option;
             }
-            const otherValue = other()
-            return otherValue instanceof AsyncOption ? otherValue.promise : otherValue
-        })
+            const otherValue = other();
+            return otherValue instanceof AsyncOption ? otherValue.promise : otherValue;
+        });
     }
 
     /**
@@ -124,10 +124,10 @@ export class AsyncOption<T> {
      * `Err(error)` and `Some` is converted to `Ok`.
      */
     toResult<E>(error: E): AsyncResult<T, E> {
-        return new AsyncResult(this.promise.then(option => option.toResult(error)))
+        return new AsyncResult(this.promise.then((option) => option.toResult(error)));
     }
 
     private thenInternal<T2>(mapper: (option: Option<T>) => Promise<Option<T2>>): AsyncOption<T2> {
-        return new AsyncOption(this.promise.then(mapper))
+        return new AsyncOption(this.promise.then(mapper));
     }
 }

@@ -16,10 +16,10 @@ test('basic invariants', () => {
     expect(Option.isOption(None)).toBe(true);
     expect(Option.isOption('foo')).toBe(false);
 
-    expect(None.isSome()).toBe(false)
-    expect(None.isNone()).toBe(true)
-    expect(someNum.isSome()).toBe(true)
-    expect(someNum.isNone()).toBe(false)
+    expect(None.isSome()).toBe(false);
+    expect(None.isNone()).toBe(true);
+    expect(someNum.isSome()).toBe(true);
+    expect(someNum.isNone()).toBe(false);
 });
 
 test('type narrowing', () => {
@@ -83,11 +83,23 @@ test('map / andThen', () => {
 });
 
 test('mapOr / mapOrElse', () => {
-    expect(None.mapOr(1, () => -1)).toEqual(1)
-    expect(None.mapOrElse(() => 1, () => -1)).toEqual(1)
+    expect(None.mapOr(1, () => -1)).toEqual(1);
+    expect(
+        None.mapOrElse(
+            () => 1,
+            () => -1,
+        ),
+    ).toEqual(1);
 
-    expect(Some(11).mapOr(1, (val) => val * 2)).toEqual(22)
-    expect(Some(11).mapOrElse(() => { throw new Error('Should not happen'); }, (val) => val * 2)).toEqual(22)
+    expect(Some(11).mapOr(1, (val) => val * 2)).toEqual(22);
+    expect(
+        Some(11).mapOrElse(
+            () => {
+                throw new Error('Should not happen');
+            },
+            (val) => val * 2,
+        ),
+    ).toEqual(22);
 });
 
 test('all / any', () => {
@@ -135,14 +147,18 @@ test('to result', () => {
 });
 
 test('or / orElse', () => {
-    expect(None.or(Some(1))).toEqual(Some(1))
-    expect(None.orElse(() => Some(1))).toEqual(Some(1))
+    expect(None.or(Some(1))).toEqual(Some(1));
+    expect(None.orElse(() => Some(1))).toEqual(Some(1));
 
-    expect(Some(1).or(Some(2))).toEqual(Some(1))
-    expect(Some(1).orElse(() => {throw new Error('Call unexpected')})).toEqual(Some(1))
-})
+    expect(Some(1).or(Some(2))).toEqual(Some(1));
+    expect(
+        Some(1).orElse(() => {
+            throw new Error('Call unexpected');
+        }),
+    ).toEqual(Some(1));
+});
 
 test('toAsyncOption()', async () => {
-    expect(await Some(1).toAsyncOption().promise).toEqual(Some(1))
-    expect(await None.toAsyncOption().promise).toEqual(None)
-})
+    expect(await Some(1).toAsyncOption().promise).toEqual(Some(1));
+    expect(await None.toAsyncOption().promise).toEqual(None);
+});

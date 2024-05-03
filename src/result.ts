@@ -1,6 +1,6 @@
 import { toString } from './utils.js';
 import { Option, None, Some } from './option.js';
-import { AsyncResult } from './asyncresult.js'
+import { AsyncResult } from './asyncresult.js';
 
 /*
  * Missing Rust Result type methods:
@@ -13,10 +13,10 @@ import { AsyncResult } from './asyncresult.js'
  */
 interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : never> {
     /** `true` when the result is Ok */
-    isOk(): this is OkImpl<T>
+    isOk(): this is OkImpl<T>;
 
     /** `true` when the result is Err */
-    isErr(): this is ErrImpl<E>
+    isErr(): this is ErrImpl<E>;
 
     /**
      * Returns the contained `Ok` value, if exists.  Throws an error if not.
@@ -39,7 +39,7 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      * @param msg the message to throw if no Err value.
      */
     expectErr(msg: string): E;
-    
+
     /**
      * Returns the contained `Ok` value.
      * Because this function may throw, its use is generally discouraged.
@@ -125,29 +125,29 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
 
     /**
      * Returns `Ok()` if we have a value, otherwise returns `other`.
-     * 
+     *
      * `other` is evaluated eagerly. If `other` is a result of a function
      * call try `orElse()` instead – it evaluates the parameter lazily.
-     * 
+     *
      * @example
-     * 
+     *
      * Ok(1).or(Ok(2)) // => Ok(1)
-     * Err('error here').or(Ok(2)) // => Ok(2) 
+     * Err('error here').or(Ok(2)) // => Ok(2)
      */
-    or<E2>(other: Result<T, E2>): Result<T, E2>
+    or<E2>(other: Result<T, E2>): Result<T, E2>;
 
     /**
      * Returns `Ok()` if we have a value, otherwise returns the result
      * of calling `other()`.
-     * 
+     *
      * `other()` is called *only* when needed and is passed the error value in a parameter.
-     * 
+     *
      * @example
-     * 
+     *
      * Ok(1).orElse(() => Ok(2)) // => Ok(1)
-     * Err('error').orElse(() => Ok(2)) // => Ok(2) 
+     * Err('error').orElse(() => Ok(2)) // => Ok(2)
      */
-    orElse<E2>(other: (error: E) => Result<T, E2>): Result<T, E2>
+    orElse<E2>(other: (error: E) => Result<T, E2>): Result<T, E2>;
 
     /**
      *  Converts from `Result<T, E>` to `Option<T>`, discarding the error if any
@@ -161,7 +161,7 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      *
      * Useful when you need to compose results with asynchronous code.
      */
-    toAsyncResult(): AsyncResult<T, E>
+    toAsyncResult(): AsyncResult<T, E>;
 }
 
 /**
@@ -172,11 +172,11 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     static readonly EMPTY = new ErrImpl<void>(undefined);
 
     isOk(): this is OkImpl<never> {
-        return false
+        return false;
     }
 
     isErr(): this is ErrImpl<E> {
-        return true
+        return true;
     }
 
     readonly error!: E;
@@ -226,7 +226,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     expectErr(_msg: string): E {
-        return this.error
+        return this.error;
     }
 
     unwrap(): never {
@@ -281,7 +281,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
     }
 
     toAsyncResult(): AsyncResult<never, E> {
-        return new AsyncResult(this)
+        return new AsyncResult(this);
     }
 }
 
@@ -296,11 +296,11 @@ export class OkImpl<T> implements BaseResult<T, never> {
     static readonly EMPTY = new OkImpl<void>(undefined);
 
     isOk(): this is OkImpl<T> {
-        return true
+        return true;
     }
 
     isErr(): this is ErrImpl<never> {
-        return false
+        return false;
     }
 
     readonly value!: T;
@@ -412,7 +412,7 @@ export class OkImpl<T> implements BaseResult<T, never> {
     }
 
     toAsyncResult(): AsyncResult<T, never> {
-        return new AsyncResult(this)
+        return new AsyncResult(this);
     }
 }
 
@@ -437,18 +437,17 @@ export namespace Result {
      * Parse a set of `Result`s, returning an array of all `Ok` values.
      * Short circuits with the first `Err` found, if any
      */
-    export function all<const T extends Result<any, any>[]>(results: T): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]>
+    export function all<const T extends Result<any, any>[]>(
+        results: T,
+    ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]>;
     export function all<T extends Result<any, any>[]>(
         ...results: T
-    ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]>
+    ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]>;
     export function all<T extends Result<any, any>[]>(
-        arg0: Head<T> | T, ...argN: Tail<T>
+        arg0: Head<T> | T,
+        ...argN: Tail<T>
     ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]> {
-        const results = arg0 === undefined
-            ? []
-            : Array.isArray(arg0)
-                ? arg0 as T
-                : [arg0, ...argN] as T;
+        const results = arg0 === undefined ? [] : Array.isArray(arg0) ? (arg0 as T) : ([arg0, ...argN] as T);
 
         const okResult = [];
         for (let result of results) {
@@ -466,18 +465,17 @@ export namespace Result {
      * Parse a set of `Result`s, short-circuits when an input value is `Ok`.
      * If no `Ok` is found, returns an `Err` containing the collected error values
      */
-    export function any<const T extends Result<any, any>[]>(results: T): Result<ResultOkTypes<T>[number], ResultErrTypes<T>>
+    export function any<const T extends Result<any, any>[]>(
+        results: T,
+    ): Result<ResultOkTypes<T>[number], ResultErrTypes<T>>;
     export function any<T extends Result<any, any>[]>(
         ...results: T
-    ): Result<ResultOkTypes<T>[number], ResultErrTypes<T>>
+    ): Result<ResultOkTypes<T>[number], ResultErrTypes<T>>;
     export function any<T extends Result<any, any>[]>(
-        arg0: Head<T> | T, ...argN: Tail<T>
+        arg0: Head<T> | T,
+        ...argN: Tail<T>
     ): Result<ResultOkTypes<T>[number], ResultErrTypes<T>> {
-        const results = arg0 === undefined
-            ? []
-            : Array.isArray(arg0)
-                ? arg0 as T
-                : [arg0, ...argN] as T;
+        const results = arg0 === undefined ? [] : Array.isArray(arg0) ? (arg0 as T) : ([arg0, ...argN] as T);
 
         const errResult = [];
 
@@ -526,6 +524,5 @@ export namespace Result {
 }
 
 // Utility types
-type Head<T extends any[]> = T extends [any, ...infer R] ?
-    T extends [...infer F, ...R] ? F : never : never
-type Tail<T extends any[]> = T extends [any, ...infer R] ? R : never
+type Head<T extends any[]> = T extends [any, ...infer R] ? (T extends [...infer F, ...R] ? F : never) : never;
+type Tail<T extends any[]> = T extends [any, ...infer R] ? R : never;

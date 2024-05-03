@@ -8,6 +8,7 @@
     "build:copy": "cp package-cjs.json dist/cjs/package.json && cp package-esm.json dist/esm/package.json",
     "clean": "rm -rf dist",
     "test": "jest",
+    "lint": "prettier src test tsconfig* package.json package-cjs.json package-esm.json --check",
     "format": "prettier src test tsconfig* package.json package-cjs.json package-esm.json --write"
   },
   "main": "dist/cjs/index.js",

@@ -234,6 +234,36 @@ test('Result.wrapAsync', async () => {
     eq<typeof c, Result<number, string>>(true);
 });
 
+test('Result.partition', async () => {
+    const ok0 = Ok(3);
+    const ok1 = new Ok(true);
+    const err0 = Err(Symbol());
+    const err1 = new Err(Error());
+
+    const all0 = Result.partition([]);
+    expect(all0).toEqual([[], []]);
+    eq<typeof all0, [[], []]>(true);
+
+    const all1 = Result.partition([ok0, ok1, err0, err1]);
+    expect(all1).toEqual([
+        [ok0.value, ok1.value],
+        [err0.error, err1.error],
+    ]);
+    eq<typeof all1, [[number, boolean, never, never], [never, never, symbol, Error]]>(true);
+
+    const all2 = Result.partition([ok0, ok1]);
+    expect(all2).toEqual([[ok0.value, ok1.value], []]);
+    eq<typeof all2, [[number, boolean], [never, never]]>(true);
+
+    const all3 = Result.partition([err0, err1]);
+    expect(all3).toEqual([[], [err0.error, err1.error]]);
+    eq<typeof all3, [[never, never], [symbol, Error]]>(true);
+
+    const all4 = Result.partition([1, 2, 3, 4].map((num) => Ok(num) as Result<number, Error>));
+    expect(all4).toEqual([[1, 2, 3, 4], []]);
+    eq<typeof all4, [number[], Error[]]>(true);
+});
+
 test('safeUnwrap', () => {
     const ok1 = new Ok(3).safeUnwrap();
     expect(ok1).toEqual(3);

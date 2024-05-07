@@ -129,6 +129,24 @@ Example:
 
     let url = results.unwrap(); // At least one attempt gave us a successful url
 
+``partition()``
+---------------
+
+.. code-block:: typescript
+
+    // The actual signature is more complicated but this should be good enough.
+    static partition<T, E>(results: Result<T, E>[]): [T[], E[]]
+
+Partitions a set of ``Result``, separating the ``Ok`` and ``Err`` values.
+
+Example:
+
+.. code-block:: typescript
+
+    let results: Result<number, string>[] = [Ok(1), Err('error1'), Ok(2), Err('error2')];
+
+    let [numbers, errors] = Result.partition(results); // [ [1, 2], ['error1', 'error2'] ]
+
 ``error``
 ---------
 

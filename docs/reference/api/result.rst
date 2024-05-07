@@ -352,7 +352,7 @@ Example:
 .. code-block:: typescript
 
     Ok(1).orElse(() => Ok(2)) // => Ok(1)
-    Err('error').orElse(() => Ok(2)) // => Ok(2)
+    Err('error').orElse(() => Ok(2)) // => Ok(2) 
 
 ``stack``
 ---------

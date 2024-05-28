@@ -1,3 +1,10 @@
+# 4.2.0
+
+Added:
+
+- Added a non-spread (you can pass an array as a single parameter) variant of `Result.all`
+- Added a new `Result.partition` convenience method
+
 # 4.1.0
 
 - A whole bunch of documentation changes

@@ -193,7 +193,7 @@ Throws if the value is ``None``.
 Returns the contained ``Some`` value or a provided default.
 
 ``unwrapOrElse()``
---------------
+------------------
 
 .. code-block:: typescript
 

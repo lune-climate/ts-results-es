@@ -13,3 +13,4 @@ The documentation will live here.
    :caption: Contents:
 
    reference/index
+   explanations/index

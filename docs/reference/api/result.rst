@@ -459,4 +459,26 @@ Example:
     goodResult.unwrapOr(5); // 1
     badResult.unwrapOr(5); // 5
 
+``unwrapOrElse()``
+------------------
+
+.. code-block:: typescript
+
+    unwrapOrElse<T2>(f: (error: E) => T2): T | T2
+
+Returns the contained ``Ok`` value or computes a value with a provided function.
+
+The function is at most one time, only if needed.
+
+Example:
+
+.. code-block:: typescript
+
+    Ok('OK').unwrapOrElse(
+        (error) => { console.log(`Called, got ${error}`); return 'UGH'; }
+    ) // => 'OK', nothing printed
+
+    Err('A03B').unwrapOrElse((error) => `UGH, got ${error}') // => 'UGH, got A03B'
+
+
 .. _cause: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause

@@ -43,6 +43,22 @@ interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never
     unwrapOr<T2>(val: T2): T | T2;
 
     /**
+     * Returns the contained `Some` value or computes a value with a provided function.
+     *
+     * The function is at most one time, only if needed.
+     *
+     * @example
+     * ```
+     * Some('OK').unwrapOrElse(
+     *     () => { console.log('Called'); return 'UGH'; }
+     * ) // => 'OK', nothing printed
+     *
+     * None.unwrapOrElse(() => 'UGH') // => 'UGH'
+     * ```
+     */
+    unwrapOrElse<T2>(f: () => T2): T | T2;
+
+    /**
      * Calls `mapper` if the Option is `Some`, otherwise returns `None`.
      * This function can be used for control flow based on `Option` values.
      */
@@ -132,6 +148,10 @@ class NoneImpl implements BaseOption<never> {
 
     unwrapOr<T2>(val: T2): T2 {
         return val;
+    }
+
+    unwrapOrElse<T2>(f: () => T2): T2 {
+        return f();
     }
 
     expect(msg: string): never {
@@ -224,6 +244,10 @@ class SomeImpl<T> implements BaseOption<T> {
     }
 
     unwrapOr(_val: unknown): T {
+        return this.value;
+    }
+
+    unwrapOrElse(_f: unknown): T {
         return this.value;
     }
 

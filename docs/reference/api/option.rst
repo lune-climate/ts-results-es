@@ -192,5 +192,26 @@ Throws if the value is ``None``.
 
 Returns the contained ``Some`` value or a provided default.
 
+``unwrapOrElse()``
+--------------
+
+.. code-block:: typescript
+
+    unwrapOrElse<T2>(f: () => T2): T | T2
+
+Returns the contained ``Some`` value or computes a value with a provided function.
+
+The function is at most one time, only if needed.
+
+Example:
+
+.. code-block:: typescript
+
+    Some('OK').unwrapOrElse(
+        () => { console.log('Called'); return 'UGH'; }
+    ) // => 'OK', nothing printed
+
+    None.unwrapOrElse(() => 'UGH') // => 'UGH'
+
 
 .. _cause: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause

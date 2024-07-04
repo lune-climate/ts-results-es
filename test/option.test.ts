@@ -1,5 +1,5 @@
 import { Err, None, Ok, Option, OptionSomeType, Result, Some } from '../src/index.js';
-import { eq } from './util.js';
+import { eq, notSupposedToBeCalled } from './util.js';
 
 const someString = Some('foo');
 const someNum = new Some(10);
@@ -65,6 +65,11 @@ test('unwrap', () => {
     expect(() => None.unwrap()).toThrow(/Tried to unwrap None/);
     expect(() => None.expect('foobar')).toThrow(/foobar/);
     expect(None.unwrapOr('honk')).toBe('honk');
+});
+
+test('unwrapOrElse', () => {
+    expect(Some('1').unwrapOrElse(notSupposedToBeCalled)).toEqual('1');
+    expect(None.unwrapOrElse(() => '2')).toEqual('2');
 });
 
 test('map / andThen', () => {

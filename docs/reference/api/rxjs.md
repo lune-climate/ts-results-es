@@ -160,21 +160,21 @@ test$.subscribe((result) => {
 
 #### filterResultErr
 
-Converts an `Observable<Result<T, E>>` to an `Observble<T>` by filtering out the Oks and mapping to the error values.
+Converts an `Observable<Result<T, E>>` to an `Observable<E>` by filtering out the Oks and mapping to the error values.
 
 ```typescript
 import { of, Observable } from 'rxjs';
 import { Ok, Err, Result } from 'ts-results-es';
-import { filterResultOk } from 'ts-results-es/rxjs-operators';
+import { filterResultErr } from 'ts-results-es/rxjs-operators';
 
 const obs$: Observable<Result<number, Error>> = of(new Ok(5), new Err(new Error('uh oh')));
 
-const test$ = obs$.pipe(filterResultOk()); // Has type Observable<number>
+const test$ = obs$.pipe(filterResultErr()); // Has type Observable<Error>
 
 test$.subscribe((result) => {
-    console.log('Got number: ' + result);
+    console.log('Got error: ' + result);
 });
 
 // Logs the following:
-// Got number: 5
+// Got error: uh oh
 ```

@@ -425,7 +425,8 @@ Example:
 
 Returns the contained ``Err`` value.
 Because this function may throw, its use is generally discouraged.
-Instead, prefer to handle the ``Ok`` case explicitly.
+Instead, prefer to handle the ``Ok`` case explicitly and access the `error`_ property
+directly.
 
 Throws if the value is an ``Ok``, with a message provided by the ``Ok``'s value and
 `cause`_ set to the value.

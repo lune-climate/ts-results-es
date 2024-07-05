@@ -58,7 +58,8 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
     /**
      * Returns the contained `Err` value.
      * Because this function may throw, its use is generally discouraged.
-     * Instead, prefer to handle the `Ok` case explicitly.
+     * Instead, prefer to handle the `Ok` case explicitly and access the `error` property
+     * directly.
      *
      * Throws if the value is an `Ok`, with a message provided by the `Ok`'s value and
      * [`cause'](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause)

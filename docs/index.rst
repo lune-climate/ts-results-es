@@ -22,3 +22,11 @@ The documentation will live here.
    :caption: Developer documentation:
 
    dev/index
+
+.. toctree::
+    :maxdepth: 1
+    :hidden:
+    :caption: Project links
+
+    Source code repository <https://github.com/lune-climate/ts-results-es/>
+    The package on NPM <https://www.npmjs.com/package/ts-results-es>

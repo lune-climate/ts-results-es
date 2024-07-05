@@ -1,5 +1,5 @@
-Explanations
-============
+Explanation
+===========
 
 .. toctree::
     ts-results-relationship

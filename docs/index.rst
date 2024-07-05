@@ -13,7 +13,7 @@ The documentation will live here.
    :caption: User documentation:
 
    reference/index
-   explanations/index
+   explanation/index
 
 
 .. toctree::

@@ -5,6 +5,9 @@ and [Option](https://doc.rust-lang.org/std/option/) objects.
 
 Brings compile-time error checking and optional values to typescript.
 
+* [The package on NPM](https://www.npmjs.com/package/ts-results-es)
+* [Documentation](https://ts-results-es.readthedocs.io)
+
 ## Contents
 
 -   [Installation](#installation)

@@ -468,7 +468,7 @@ Example:
 
 Returns the contained ``Ok`` value or computes a value with a provided function.
 
-The function is at most one time, only if needed.
+The function is called at most one time, only if needed.
 
 Example:
 
@@ -478,7 +478,7 @@ Example:
         (error) => { console.log(`Called, got ${error}`); return 'UGH'; }
     ) // => 'OK', nothing printed
 
-    Err('A03B').unwrapOrElse((error) => `UGH, got ${error}') // => 'UGH, got A03B'
+    Err('A03B').unwrapOrElse((error) => `UGH, got ${error}`) // => 'UGH, got A03B'
 
 
 .. _cause: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause

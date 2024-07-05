@@ -201,7 +201,7 @@ Returns the contained ``Some`` value or a provided default.
 
 Returns the contained ``Some`` value or computes a value with a provided function.
 
-The function is at most one time, only if needed.
+The function is called at most one time, only if needed.
 
 Example:
 

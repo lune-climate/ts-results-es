@@ -84,7 +84,7 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
     /**
      * Returns the contained `Ok` value or computes a value with a provided function.
      *
-     * The function is at most one time, only if needed.
+     * The function is called at most one time, only if needed.
      *
      * @example
      * ```
@@ -92,7 +92,7 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      *     (error) => { console.log(`Called, got ${error}`); return 'UGH'; }
      * ) // => 'OK', nothing printed
      *
-     * Err('A03B').unwrapOrElse((error) => `UGH, got ${error}') // => 'UGH, got A03B'
+     * Err('A03B').unwrapOrElse((error) => `UGH, got ${error}`) // => 'UGH, got A03B'
      * ```
      */
     unwrapOrElse<T2>(f: (error: E) => T2): T | T2;

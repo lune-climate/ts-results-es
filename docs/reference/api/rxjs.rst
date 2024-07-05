@@ -19,7 +19,7 @@ on a stream of Result objects.
    const obs$: Observable<Result<number, Error>> = of(Ok(5), Err('uh oh'));
 
    const greaterThanZero = obs$.pipe(
-       resultMap((number) => number > 0), // Doubles the value
+       resultMap((number) => number > 0), // Return true for values greater zero
    ); // Has type Observable<Result<boolean, 'uh oh'>>
 
    greaterThanZero.subscribe((result) => {
@@ -31,7 +31,7 @@ on a stream of Result objects.
    });
 
    // Logs the following:
-   // Got number: 10
+   // Was greater than zero: true
    // Got Error Message: uh oh
 
 ``resultMapErr()``

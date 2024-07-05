@@ -94,3 +94,7 @@ expect.extend({
         };
     },
 });
+
+export function notSupposedToBeCalled() {
+    throw new Error('This is not supposed to be called');
+}

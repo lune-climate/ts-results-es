@@ -10,7 +10,14 @@ The documentation will live here.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: User documentation:
 
    reference/index
    explanations/index
+
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Developer documentation:
+
+   dev/index

@@ -10,7 +10,7 @@ import {
     ResultOkTypes,
     Some,
 } from '../src/index.js';
-import { eq } from './util.js';
+import { eq, notSupposedToBeCalled } from './util.js';
 
 test('Err<E> | Ok<T> should be Result<T, E>', () => {
     const r1 = Err(0);
@@ -332,4 +332,9 @@ test('toAsyncResult()', async () => {
     expect(await Ok(1).toAsyncResult().promise).toEqual(Ok(1));
     const err = Err('error');
     expect(await err.toAsyncResult().promise).toEqual(err);
+});
+
+test('unwrapOrElse', () => {
+    expect(Ok({ data: 'user data' }).unwrapOrElse(notSupposedToBeCalled)).toEqual({ data: 'user data' });
+    expect(Err('bad error').unwrapOrElse((error) => ({ error }))).toEqual({ error: 'bad error' });
 });

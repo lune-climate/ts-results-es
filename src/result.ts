@@ -7,7 +7,6 @@ import { AsyncResult } from './asyncresult.js';
  * pub fn contains<U>(&self, x: &U) -> bool
  * pub fn contains_err<F>(&self, f: &F) -> bool
  * pub fn and<U>(self, res: Result<U, E>) -> Result<U, E>
- * pub fn unwrap_or_else<F>(self, op: F) -> T
  * pub fn expect_err(self, msg: &str) -> E
  * pub fn unwrap_or_default(self) -> T
  */
@@ -81,6 +80,22 @@ interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : ne
      *  (This is the `unwrap_or` in rust)
      */
     unwrapOr<T2>(val: T2): T | T2;
+
+    /**
+     * Returns the contained `Ok` value or computes a value with a provided function.
+     *
+     * The function is called at most one time, only if needed.
+     *
+     * @example
+     * ```
+     * Ok('OK').unwrapOrElse(
+     *     (error) => { console.log(`Called, got ${error}`); return 'UGH'; }
+     * ) // => 'OK', nothing printed
+     *
+     * Err('A03B').unwrapOrElse((error) => `UGH, got ${error}`) // => 'UGH, got A03B'
+     * ```
+     */
+    unwrapOrElse<T2>(f: (error: E) => T2): T | T2;
 
     /**
      * Calls `mapper` if the result is `Ok`, otherwise returns the `Err` value of self.
@@ -218,6 +233,10 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         return val;
     }
 
+    unwrapOrElse<T2>(f: (error: E) => T2): T2 {
+        return f(this.error);
+    }
+
     expect(msg: string): never {
         // The cause casting required because of the current TS definition being overly restrictive
         // (the definition says it has to be an Error while it can be anything).
@@ -337,6 +356,10 @@ export class OkImpl<T> implements BaseResult<T, never> {
     }
 
     unwrapOr(_val: unknown): T {
+        return this.value;
+    }
+
+    unwrapOrElse(_f: unknown): T {
         return this.value;
     }
 

@@ -12,6 +12,7 @@ The documentation will live here.
    :maxdepth: 2
    :caption: User documentation:
 
+   tutorials/index
    reference/index
    explanation/index
 

@@ -30,5 +30,5 @@ $ yarn add ts-results-es
 
 ## Usage
 
-See https://ts-results-es.readthedocs.io/en/latest/reference/api/index.html to see the API
+See https://ts-results-es.readthedocs.io/en/latest/reference/index.html to see the API
 reference.

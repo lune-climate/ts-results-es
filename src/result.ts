@@ -545,7 +545,7 @@ export namespace Result {
     /**
      * Partitions a set of results, separating the `Ok` and `Err` values.
      */
-    export function partition<const T extends Result<any, any>[]>(results: T): [ResultOkTypes<T>, ResultErrTypes<T>] {
+    export function partition<T extends Result<any, any>[]>(results: T): [ResultOkTypes<T>, ResultErrTypes<T>] {
         return results.reduce(
             ([oks, errors], v) =>
                 v.isOk()

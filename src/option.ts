@@ -2,7 +2,7 @@ import { AsyncOption } from './asyncoption.js';
 import { toString } from './utils.js';
 import { Result, Ok, Err } from './result.js';
 
-interface BaseOption<T> extends Iterable<T extends Iterable<infer U> ? U : never> {
+interface BaseOption<T> extends Iterable<T> {
     /** `true` when the Option is Some */
     isSome(): this is SomeImpl<T>;
 
@@ -220,19 +220,8 @@ class SomeImpl<T> implements BaseOption<T> {
 
     readonly value!: T;
 
-    /**
-     * Helper function if you know you have an Some<T> and T is iterable
-     */
-    [Symbol.iterator](): Iterator<T extends Iterable<infer U> ? U : never> {
-        const obj = Object(this.value) as Iterable<any>;
-
-        return Symbol.iterator in obj
-            ? obj[Symbol.iterator]()
-            : {
-                  next(): IteratorResult<never, never> {
-                      return { done: true, value: undefined! };
-                  },
-              };
+    [Symbol.iterator](): Iterator<T> {
+        return [this.value][Symbol.iterator]();
     }
 
     constructor(val: T) {

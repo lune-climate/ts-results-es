@@ -10,7 +10,7 @@ import { AsyncResult } from './asyncresult.js';
  * pub fn expect_err(self, msg: &str) -> E
  * pub fn unwrap_or_default(self) -> T
  */
-interface BaseResult<T, E> extends Iterable<T extends Iterable<infer U> ? U : never> {
+interface BaseResult<T, E> extends Iterable<T> {
     /** `true` when the result is Ok */
     isOk(): this is OkImpl<T>;
 
@@ -325,19 +325,8 @@ export class OkImpl<T> implements BaseResult<T, never> {
 
     readonly value!: T;
 
-    /**
-     * Helper function if you know you have an Ok<T> and T is iterable
-     */
-    [Symbol.iterator](): Iterator<T extends Iterable<infer U> ? U : never> {
-        const obj = Object(this.value) as Iterable<any>;
-
-        return Symbol.iterator in obj
-            ? obj[Symbol.iterator]()
-            : {
-                  next(): IteratorResult<never, never> {
-                      return { done: true, value: undefined! };
-                  },
-              };
+    [Symbol.iterator](): Iterator<T> {
+        return [this.value][Symbol.iterator]();
     }
 
     constructor(val: T) {

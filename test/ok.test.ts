@@ -114,7 +114,6 @@ test('mapOr / mapOrElse', () => {
 });
 
 test('iterable', () => {
-    const values = Array.from(Ok('hello'));
     expect(Array.from(Ok('hello'))).toEqual(['hello']);
     expect(Array.from(Ok([1, 2, 3]))).toEqual([[1, 2, 3]]);
     expect(Array.from(Ok(1))).toEqual([1]);

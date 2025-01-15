@@ -1,3 +1,23 @@
+# 5.0.0 (not released yet)
+
+Backwards incompatible:
+
+- Changed `Option` and `Result` iterator behavior such that iterating `Some` and `Ok` will
+  instead produce only one result – the wrapped value. Previously the iteration depended on
+  the type of the wrapped value (iteratable or not) and produced results obtained by iterating
+  the wrapped values.
+
+  For example:
+
+  ```
+  const o: Option<number[]> = Some([1, 2, 3])
+  const rs = Array.from(o)
+  // Previously: rs was [1, 2, 3]
+  // Now: rs equals [[1, 2, 3]]
+  ```
+
+  Iterating `None` and `Err` is not affected and continues to produce no results.
+
 # 4.2.0
 
 Added:

@@ -114,25 +114,9 @@ test('mapOr / mapOrElse', () => {
 });
 
 test('iterable', () => {
-    let i = 0;
-    for (const char of Ok('hello')) {
-        expect('hello'[i]).toBe(char);
-        expect_string(char, true);
-        i++;
-    }
-
-    i = 0;
-    for (const item of Ok([1, 2, 3])) {
-        expect([1, 2, 3][i]).toBe(item);
-        eq<number, typeof item>(true);
-        i++;
-    }
-
-    for (const item of Ok(1)) {
-        expect_never(item, true);
-
-        throw new Error('Unreachable, Err@@iterator should emit no value and return');
-    }
+    expect(Array.from(Ok('hello'))).toEqual(['hello']);
+    expect(Array.from(Ok([1, 2, 3]))).toEqual([[1, 2, 3]]);
+    expect(Array.from(Ok(1))).toEqual([1]);
 });
 
 test('to string', () => {

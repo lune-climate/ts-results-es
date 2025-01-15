@@ -167,3 +167,11 @@ test('toAsyncOption()', async () => {
     expect(await Some(1).toAsyncOption().promise).toEqual(Some(1));
     expect(await None.toAsyncOption().promise).toEqual(None);
 });
+
+test('iteration', () => {
+    const iterator = (Some(1) as Option<number>)[Symbol.iterator]();
+    eq<Iterator<number>, typeof iterator>(true);
+
+    expect(Array.from(Some(1))).toEqual([1]);
+    expect(Array.from(None)).toEqual([]);
+});

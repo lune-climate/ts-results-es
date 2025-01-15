@@ -61,11 +61,11 @@ test('mapErr', () => {
 test('Iterable', () => {
     const r1 = new Ok([true, false]) as Result<boolean[], number>;
     const r1Iter = r1[Symbol.iterator]();
-    eq<Iterator<boolean>, typeof r1Iter>(true);
+    eq<Iterator<boolean[]>, typeof r1Iter>(true);
 
     const r2 = new Ok(32) as Result<number, string>;
     const r2Iter = r2[Symbol.iterator]();
-    eq<Iterator<never>, typeof r2Iter>(true);
+    eq<Iterator<number>, typeof r2Iter>(true);
 });
 
 test('ResultOkType', () => {

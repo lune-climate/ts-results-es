@@ -43,6 +43,10 @@ export class AsyncResult<T, E> {
      * await badResult.andThen(async (value) => Ok(value * 2)).promise // Err('boo')
      * ```
      */
+    andThen<T2>(mapper: (val: T) => Ok<T2> | Promise<Ok<T2>> | AsyncResult<T2, never>): AsyncResult<T2, E>;
+    andThen<T2, E2>(
+        mapper: (val: T) => Result<T2, E2> | Promise<Result<T2, E2>> | AsyncResult<T2, E2>,
+    ): AsyncResult<T2, E | E2>;
     andThen<T2, E2>(
         mapper: (val: T) => Result<T2, E2> | Promise<Result<T2, E2>> | AsyncResult<T2, E2>,
     ): AsyncResult<T2, E | E2> {

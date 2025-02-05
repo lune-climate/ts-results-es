@@ -1,5 +1,5 @@
-import { eq } from 'util.js';
 import { AsyncResult, Err, Ok, Result, Some } from '../src/index.js';
+import { eq } from './util.js';
 
 test('andThen() should work', async () => {
     const err = Err('error');

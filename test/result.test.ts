@@ -157,7 +157,7 @@ test('Result.any', () => {
     expect(any0).toMatchResult(Err([]));
     eq<typeof any0, Result<never, []>>(true);
 
-    const any0Array = Result.any();
+    const any0Array = Result.any([]);
     expect(any0Array).toMatchResult(Err([]));
     eq<typeof any0Array, Result<never, []>>(true);
 

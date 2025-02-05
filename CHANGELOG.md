@@ -17,7 +17,7 @@ Backwards incompatible:
   ```
 
   Iterating `None` and `Err` is not affected and continues to produce no results.
-- Removed the parameter-spread variants of `Result.all` and `Result.any`. Both of these
+- Removed the parameter spread variants of `Result.all` and `Result.any`. Both of these
   methods now only take a single array parameter (the array parameter has already been
   supported for a while).
 

@@ -323,6 +323,22 @@ test('To option', () => {
 });
 
 test('or / orElse', () => {
+    const result = Err('boo') as Result<number, string>;
+
+    const afterOrElseAlwaysErr = result.orElse((error) => Err(error === 'boo'));
+    eq<typeof afterOrElseAlwaysErr, Result<number, boolean>>(true);
+    const afterOrElseAlwaysOk = result.orElse((_error) => Ok(1));
+    eq<typeof afterOrElseAlwaysOk, Result<number, never>>(true);
+    const afterOrElseAnyResult = result.orElse((error) => (error === 'foo' ? Ok(1) : Err('bar')));
+    eq<typeof afterOrElseAnyResult, Result<number, string>>(true);
+
+    const afterOrErr = result.or(Err(true));
+    eq<typeof afterOrErr, Result<number, boolean>>(true);
+    const afterOrOk = result.or(Ok(1));
+    eq<typeof afterOrOk, Result<number, never>>(true);
+    const afterOrResult = result.or(Err(true) as Result<number, boolean>);
+    eq<typeof afterOrResult, Result<number, boolean>>(true);
+
     expect(Err('error').or(Ok(1))).toEqual(Ok(1));
     expect(Err('error').orElse((error) => Ok(error.length))).toEqual(Ok(5));
 

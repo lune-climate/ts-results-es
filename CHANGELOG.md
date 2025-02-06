@@ -18,6 +18,11 @@ Backwards incompatible:
 
   Iterating `None` and `Err` is not affected and continues to produce no results.
 
+Fixed:
+
+- Fixed `Result.or` and `Result.orElse` method types to actually be callable and return
+  reasonable types when called.
+
 # 4.2.0
 
 Added:

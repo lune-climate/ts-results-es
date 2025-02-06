@@ -280,10 +280,14 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         return default_(this.error);
     }
 
+    or<T>(other: Ok<T>): Result<T, never>;
+    or<R extends Result<any, any>>(other: R): R;
     or<T, E2>(other: Result<T, E2>): Result<T, E2> {
         return other;
     }
 
+    orElse<T>(other: (error: E) => Ok<T>): Result<T, never>;
+    orElse<R extends Result<any, any>>(other: (error: E) => R): R;
     orElse<T, E2>(other: (error: E) => Result<T, E2>): Result<T, E2> {
         return other(this.error);
     }
@@ -395,11 +399,11 @@ export class OkImpl<T> implements BaseResult<T, never> {
         return mapper(this.value);
     }
 
-    or<E2>(_other: Result<T, E2>): Result<T, E2> {
+    or(_other: Result<T, any>): Ok<T> {
         return this;
     }
 
-    orElse<E2>(_other: (error: never) => Result<T, E2>): Result<T, E2> {
+    orElse(_other: (error: never) => Result<T, any>): Ok<T> {
         return this;
     }
 

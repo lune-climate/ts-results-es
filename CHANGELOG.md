@@ -21,6 +21,11 @@ Backwards incompatible:
   methods now only take a single array parameter (the array parameter has already been
   supported for a while).
 
+Fixed:
+
+- Fixed `Result.or` and `Result.orElse` method types to actually be callable and return
+  reasonable types when called.
+
 # 4.2.0
 
 Added:

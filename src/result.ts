@@ -456,16 +456,7 @@ export namespace Result {
      */
     export function all<const T extends Result<any, any>[]>(
         results: T,
-    ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]>;
-    export function all<T extends Result<any, any>[]>(
-        ...results: T
-    ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]>;
-    export function all<T extends Result<any, any>[]>(
-        arg0: Head<T> | T,
-        ...argN: Tail<T>
     ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]> {
-        const results = arg0 === undefined ? [] : Array.isArray(arg0) ? (arg0 as T) : ([arg0, ...argN] as T);
-
         const okResult = [];
         for (let result of results) {
             if (result.isOk()) {
@@ -484,16 +475,7 @@ export namespace Result {
      */
     export function any<const T extends Result<any, any>[]>(
         results: T,
-    ): Result<ResultOkTypes<T>[number], ResultErrTypes<T>>;
-    export function any<T extends Result<any, any>[]>(
-        ...results: T
-    ): Result<ResultOkTypes<T>[number], ResultErrTypes<T>>;
-    export function any<T extends Result<any, any>[]>(
-        arg0: Head<T> | T,
-        ...argN: Tail<T>
     ): Result<ResultOkTypes<T>[number], ResultErrTypes<T>> {
-        const results = arg0 === undefined ? [] : Array.isArray(arg0) ? (arg0 as T) : ([arg0, ...argN] as T);
-
         const errResult = [];
 
         // short-circuits
@@ -552,7 +534,3 @@ export namespace Result {
         return val instanceof Err || val instanceof Ok;
     }
 }
-
-// Utility types
-type Head<T extends any[]> = T extends [any, ...infer R] ? (T extends [...infer F, ...R] ? F : never) : never;
-type Tail<T extends any[]> = T extends [any, ...infer R] ? R : never;

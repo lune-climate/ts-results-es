@@ -22,6 +22,8 @@ Fixed:
 
 - Fixed `Result.or` and `Result.orElse` method types to actually be callable and return
   reasonable types when called.
+- Fixed `AsyncResult.andThen` to return the correct type when the provided callback
+  always returns an `Ok`.
 
 # 4.2.0
 

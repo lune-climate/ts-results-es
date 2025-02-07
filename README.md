@@ -1,9 +1,9 @@
 # ts-results-es
 
-A typescript implementation of Rust's [Result](https://doc.rust-lang.org/std/result/)
+A TypeScript implementation of Rust's [Result](https://doc.rust-lang.org/std/result/)
 and [Option](https://doc.rust-lang.org/std/option/) objects.
 
-Brings compile-time error checking and optional values to typescript.
+Brings compile-time error checking and optional values to TypeScript.
 
 * [The package on NPM](https://www.npmjs.com/package/ts-results-es)
 * [Documentation](https://ts-results-es.readthedocs.io)

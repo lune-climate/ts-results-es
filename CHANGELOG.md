@@ -1,4 +1,4 @@
-# 5.0.0 (not released yet)
+# 5.0.0
 
 Backwards incompatible:
 
@@ -27,6 +27,12 @@ Fixed:
   reasonable types when called.
 - Fixed `AsyncResult.andThen` to return the correct type when the provided callback
   always returns an `Ok`.
+- Fixed the `Result.partition` signature.
+
+Added:
+
+- `Option.unwrapOrElse`
+- `Result.unwrapOrElse`
 
 # 4.2.0
 

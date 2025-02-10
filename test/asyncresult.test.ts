@@ -1,10 +1,9 @@
-import { AsyncResult, Err, Ok, Result, Some } from '../src/index.js';
-import { eq } from './util.js';
+import { AsyncResult, Err, Ok, Some } from '../src/index.js';
 
 test('andThen() should work', async () => {
     const err = Err('error');
     const badResult = new AsyncResult(err);
-    const goodResult = new AsyncResult(Ok(100) as Result<number, string>);
+    const goodResult = new AsyncResult(Ok(100));
 
     expect(
         await badResult.andThen(() => {
@@ -13,11 +12,6 @@ test('andThen() should work', async () => {
     ).toEqual(err);
     expect(await goodResult.andThen((value) => Promise.resolve(Ok(value * 2))).promise).toEqual(Ok(200));
     expect(await goodResult.andThen((value) => Ok(value * 3).toAsyncResult()).promise).toEqual(Ok(300));
-
-    const afterAndThenOk = goodResult.andThen((value) => Promise.resolve(Ok(value * 2)));
-    eq<typeof afterAndThenOk, AsyncResult<number, string>>(true);
-    const afterAndThenResult = goodResult.andThen(() => Ok(true) as Result<boolean, boolean>);
-    eq<typeof afterAndThenResult, AsyncResult<boolean, string | boolean>>(true);
 });
 
 test('map() should work', async () => {

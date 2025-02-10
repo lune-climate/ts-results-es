@@ -1,4 +1,4 @@
-# 5.0.1 (not released yet)
+# 5.0.1
 
 Fixed:
 

@@ -1,6 +1,6 @@
 {
   "name": "ts-results-es",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "A TypeScript implementation of Rust's Result and Option objects.",
   "scripts": {
     "build": "npm run clean && npm run build:ts && npm run build:copy",

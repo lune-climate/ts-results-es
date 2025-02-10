@@ -1,3 +1,10 @@
+# 5.0.1 (not released yet)
+
+Fixed:
+
+- Fixed the regression introduced in 5.0.0 as part of the `AsyncResult.andThen` fix. The fix
+  is completely reverted for now.
+
 # 5.0.0
 
 Backwards incompatible:
@@ -25,8 +32,9 @@ Fixed:
 
 - Fixed `Result.or` and `Result.orElse` method types to actually be callable and return
   reasonable types when called.
-- Fixed `AsyncResult.andThen` to return the correct type when the provided callback
+- Attempted to fix `AsyncResult.andThen` to return the correct type when the provided callback
   always returns an `Ok`.
+  This attempt has been (for now) reverted in 5.0.1 as it created other problems.
 - Fixed the `Result.partition` signature.
 
 Added:

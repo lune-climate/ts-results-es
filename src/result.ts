@@ -105,7 +105,6 @@ interface BaseResult<T, E> extends Iterable<T> {
     andThen<T2>(mapper: (val: T) => Ok<T2>): Result<T2, E>;
     andThen<E2>(mapper: (val: T) => Err<E2>): Result<T, E | E2>;
     andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E | E2>;
-    andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E | E2>;
 
     /**
      * Maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `Ok` value,

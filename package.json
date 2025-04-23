@@ -23,6 +23,10 @@
       "import": "./dist/esm/rxjs-operators/index.js"
     }
   },
+  "files": [
+    "src",
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/lune-climate/ts-results-es.git"

@@ -266,7 +266,12 @@ test('Issue #24', () => {
         return Err(new Error('Payload is false'));
     };
 
-    const processStatus = (): Result<boolean, Error> => {
+    // Changed while resolving https://github.com/lune-climate/ts-results-es/issues/197
+    // Originally the return type here had Error in the Err position but that's an edge
+    // case (attaching a mapper always returning Ok). It was difficult to maintain the
+    // existing behavior while fixing the andThen/orElse problems that were much
+    // more general and affecting actually idiomatic use of the library.
+    const processStatus = (): Result<boolean, unknown> => {
         return getStatus(true)
             .andThen((result) => Ok(result))
             .map((data) => data);
@@ -288,11 +293,11 @@ test('or / orElse', () => {
     const result = Err('boo') as Result<number, string>;
 
     const afterOrElseAlwaysErr = result.orElse((error) => Err(error === 'boo'));
-    eq<typeof afterOrElseAlwaysErr, Result<number, boolean>>(true);
+    eq<typeof afterOrElseAlwaysErr, Result<number | unknown, boolean>>(true);
     const afterOrElseAlwaysOk = result.orElse((_error) => Ok(1));
-    eq<typeof afterOrElseAlwaysOk, Result<number, never>>(true);
+    eq<typeof afterOrElseAlwaysOk, Result<number | 1, unknown>>(true);
     const afterOrElseAnyResult = result.orElse((error) => (error === 'foo' ? Ok(1) : Err('bar')));
-    eq<typeof afterOrElseAnyResult, Result<number, string>>(true);
+    eq<typeof afterOrElseAnyResult, Result<number | 1, string>>(true);
 
     const afterOrErr = result.or(Err(true));
     eq<typeof afterOrErr, Result<number, boolean>>(true);
@@ -321,4 +326,50 @@ test('toAsyncResult()', async () => {
 test('unwrapOrElse', () => {
     expect(Ok({ data: 'user data' }).unwrapOrElse(notSupposedToBeCalled)).toEqual({ data: 'user data' });
     expect(Err('bad error').unwrapOrElse((error) => ({ error }))).toEqual({ error: 'bad error' });
+});
+
+test('andThen/orElse chaining regression', () => {
+    // Based on this issue: https://github.com/lune-climate/ts-results-es/issues/197
+    class T1 {
+        name = 'T1' as const;
+    }
+    class T2 {
+        name = 'T2' as const;
+    }
+    class T3 {
+        name = 'T3' as const;
+    }
+    class E1 {
+        name = 'E1' as const;
+    }
+    class E2 {
+        name = 'E2' as const;
+    }
+    class E3 {
+        name = 'E3' as const;
+    }
+
+    function foo1(): Result<T1, E1> {
+        return Ok({ name: 'T1' });
+    }
+    function foo2(): Result<T2, E2> {
+        return Ok({ name: 'T2' });
+    }
+    function foo3(): Result<T3, E3> {
+        return Ok({ name: 'T3' });
+    }
+
+    const test1 = foo1()
+        .andThen(() => foo2())
+        .orElse(() => foo3());
+
+    expect(test1).toEqual(Ok({ name: 'T2' }));
+    eq<typeof test1, Ok<T2> | Ok<T3> | Err<E3>>(true);
+
+    const test2 = foo1()
+        .orElse(() => foo2())
+        .andThen(() => foo3());
+
+    expect(test2).toEqual(Ok({ name: 'T3' }));
+    eq<typeof test2, Ok<T3> | Err<E3> | Err<E2 | E3>>(true);
 });

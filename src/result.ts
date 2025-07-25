@@ -102,8 +102,6 @@ interface BaseResult<T, E> extends Iterable<T> {
      * Calls `mapper` if the result is `Ok`, otherwise returns the `Err` value of self.
      * This function can be used for control flow based on `Result` values.
      */
-    andThen<T2>(mapper: (val: T) => Ok<T2>): Result<T2, E>;
-    andThen<E2>(mapper: (val: T) => Err<E2>): Result<T, E | E2>;
     andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E | E2>;
 
     /**
@@ -162,7 +160,7 @@ interface BaseResult<T, E> extends Iterable<T> {
      * Ok(1).orElse(() => Ok(2)) // => Ok(1)
      * Err('error').orElse(() => Ok(2)) // => Ok(2)
      */
-    orElse<E2>(other: (error: E) => Result<T, E2>): Result<T, E2>;
+    orElse<T2, E2>(other: (error: E) => Result<T2, E2>): Result<T | T2, E2>;
 
     /**
      *  Converts from `Result<T, E>` to `Option<T>`, discarding the error if any
@@ -263,7 +261,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         return this;
     }
 
-    andThen(op: unknown): Err<E> {
+    andThen<T2, E2>(op: (val: never) => Result<T2, E2>): Result<T2, E | E2> {
         return this;
     }
 
@@ -285,9 +283,7 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         return other;
     }
 
-    orElse<T>(other: (error: E) => Ok<T>): Result<T, never>;
-    orElse<R extends Result<any, any>>(other: (error: E) => R): R;
-    orElse<T, E2>(other: (error: E) => Result<T, E2>): Result<T, E2> {
+    orElse<T2, E2>(other: (error: E) => Result<T2, E2>): Result<T2, E2> {
         return other(this.error);
     }
 
@@ -379,9 +375,6 @@ export class OkImpl<T> implements BaseResult<T, never> {
         return new Ok(mapper(this.value));
     }
 
-    andThen<T2>(mapper: (val: T) => Ok<T2>): Ok<T2>;
-    andThen<E2>(mapper: (val: T) => Err<E2>): Result<T, E2>;
-    andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E2>;
     andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E2> {
         return mapper(this.value);
     }
@@ -402,7 +395,7 @@ export class OkImpl<T> implements BaseResult<T, never> {
         return this;
     }
 
-    orElse(_other: (error: never) => Result<T, any>): Ok<T> {
+    orElse<T2, E2>(_other: (error: never) => Result<T2, E2>): Result<T, never> {
         return this;
     }
 

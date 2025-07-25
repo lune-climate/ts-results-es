@@ -13,7 +13,9 @@ export class AsyncResult<T, E> {
     /**
      * A promise that resolves to a synchronous result.
      *
-     * Await it to convert `AsyncResult<T, E>` to `Result<T, E>`.
+     * You can await it to convert `AsyncResult<T, E>` to `Result<T, E>`, but prefer
+     * awaiting `AsyncResult` directly (see: `then()`). Only use this property
+     * if you need the underlying Promise for specific use cases.
      */
     promise: Promise<Result<T, E>>;
 
@@ -152,6 +154,29 @@ export class AsyncResult<T, E> {
      */
     toOption(): AsyncOption<T> {
         return new AsyncOption(this.promise.then((result) => result.toOption()));
+    }
+
+    /**
+     * Makes `AsyncResult` awaitable by implementing the thenable interface.
+     * This allows you to use `await` directly on `AsyncResult` instances.
+     *
+     * See the [Promise.then() documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then)
+     * for details on the thenable interface.
+     *
+     * @example
+     * ```typescript
+     * const asyncResult = new AsyncResult(Ok(42))
+     * const result = await asyncResult // Returns Result<number, Error>
+     *
+     * // Equivalent to:
+     * const result2 = await asyncResult.promise
+     * ```
+     */
+    then<TResult1 = Result<T, E>, TResult2 = never>(
+        onfulfilled?: ((value: Result<T, E>) => TResult1 | PromiseLike<TResult1>) | null,
+        onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null,
+    ): Promise<TResult1 | TResult2> {
+        return this.promise.then(onfulfilled, onrejected);
     }
 
     private thenInternal<T2, E2>(mapper: (result: Result<T, E>) => Promise<Result<T2, E2>>): AsyncResult<T2, E2> {

@@ -56,7 +56,7 @@ Example:
 
     await hasValue.andThen(async (value) => Some(value * 2)).promise // Some(2)
     await hasValue.andThen(async (value) => None).promise // None
-    await noValue.andThen(async (value) => Ok(value * 2)).promise // None
+    await noValue.andThen(async (value) => Some(value * 2)).promise // None
 
 ``map()``
 ---------
@@ -74,7 +74,7 @@ Example:
 
 .. code-block:: typescript
 
-    let hasValue = Ok(1).toAsyncOption()
+    let hasValue = Some(1).toAsyncOption()
     let noValue = None.toAsyncOption()
 
     await hasValue.map(async (value) => value * 2).promise // Some(2)
@@ -132,11 +132,11 @@ Example:
 
 .. code-block:: typescript
 
-    promise: Promise<Result<T, E>>
+    promise: Promise<Option<T>>
 
-A promise that resolves to a synchronous result.
+A promise that resolves to a synchronous ``Option``.
 
-Await it to convert ``AsyncResult<T, E>`` to ``Result<T, E>``.
+Await it to convert ``AsyncOption<T>`` to ``Option<T>``.
 
 
 ``toResult()``

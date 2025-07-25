@@ -85,5 +85,6 @@ test('AsyncResult should be awaitable', async () => {
     expect(result1).toEqual(Ok(42));
 
     const result2 = await badResult;
-    expect(result2).toEqual(Err('error'));
+    expect(result2.isErr()).toBe(true);
+    expect(result2.unwrapErr()).toEqual('error');
 });

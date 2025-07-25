@@ -40,7 +40,7 @@ export class AsyncOption<T> {
      *
      * await hasValue.andThen(async (value) => Some(value * 2)).promise // Some(2)
      * await hasValue.andThen(async (value) => None).promise // None
-     * await noValue.andThen(async (value) => Ok(value * 2)).promise // None
+     * await noValue.andThen(async (value) => Some(value * 2)).promise // None
      * ```
      */
     andThen<T2>(mapper: (val: T) => Option<T2> | Promise<Option<T2>> | AsyncOption<T2>): AsyncOption<T2> {
@@ -61,7 +61,7 @@ export class AsyncOption<T> {
      *
      * @example
      * ```typescript
-     * let hasValue = Ok(1).toAsyncOption()
+     * let hasValue = Some(1).toAsyncOption()
      * let noValue = None.toAsyncOption()
      *
      * await hasValue.map(async (value) => value * 2).promise // Some(2)

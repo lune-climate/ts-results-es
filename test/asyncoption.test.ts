@@ -65,3 +65,15 @@ test('toResult() should work', async () => {
     const result = new AsyncOption(None);
     expect((await result.toResult('Blah').promise).unwrapErr()).toEqual('Blah');
 });
+
+test('AsyncOption should be awaitable', async () => {
+    const hasValue = new AsyncOption(Some(42));
+    const noValue = new AsyncOption(None);
+
+    // Should be able to await AsyncOption directly
+    const result1 = await hasValue;
+    expect(result1).toEqual(Some(42));
+
+    const result2 = await noValue;
+    expect(result2).toEqual(None);
+});

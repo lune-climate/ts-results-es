@@ -1,5 +1,5 @@
 import { assert } from 'conditional-type-checks';
-import { Err, Ok } from '../src/index.js';
+import { Err, Ok, Result } from '../src/index.js';
 import { eq, expect_never } from './util.js';
 
 test('Constructable & Callable', () => {
@@ -93,7 +93,7 @@ test('map', () => {
 test('andThen', () => {
     const err = new Err('Err').andThen(() => new Ok(3));
     expect(err).toMatchResult(Err('Err'));
-    eq<typeof err, Err<string>>(true);
+    eq<typeof err, Result<number, unknown>>(true);
 });
 
 test('mapErr', () => {

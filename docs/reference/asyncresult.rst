@@ -8,6 +8,8 @@ the moment when you're ready to extract the final ``Result`` out of it.
 
 Can also be combined with synchronous code for convenience.
 
+``AsyncResult`` is awaitable - see `then()`_ for details.
+
 .. code-block:: typescript
 
     // T is the Ok value type, E is the Err error type
@@ -160,7 +162,32 @@ Example:
 
 A promise that resolves to a synchronous result.
 
-Await it to convert ``AsyncResult<T, E>`` to ``Result<T, E>``.
+You can await it to convert ``AsyncResult<T, E>`` to ``Result<T, E>``, but prefer 
+awaiting ``AsyncResult`` directly (see: `then()`_). Only use this property 
+if you need the underlying Promise for specific use cases.
+
+``then()``
+----------
+
+.. code-block:: typescript
+
+    then<TResult1 = Result<T, E>, TResult2 = never>(
+        onfulfilled?: ((value: Result<T, E>) => TResult1 | PromiseLike<TResult1>) | null,
+        onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null
+    ): Promise<TResult1 | TResult2>
+
+Makes ``AsyncResult`` awaitable by implementing the thenable interface.
+This allows you to use ``await`` directly on ``AsyncResult`` instances.
+
+See the `Promise.then() documentation <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then>`_ 
+for details on the thenable interface.
+
+Example:
+
+.. code-block:: typescript
+
+    const asyncResult = new AsyncResult(Ok(42))
+    const result = await asyncResult // Returns Result<number, Error>
 
 
 ``toOption()``

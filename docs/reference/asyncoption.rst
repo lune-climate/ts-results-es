@@ -8,6 +8,8 @@ the moment when you're ready to extract the final ``Option`` out of it.
 
 Can also be combined with synchronous code for convenience.
 
+``AsyncOption`` is awaitable - see `then()`_ for details.
+
 .. code-block:: typescript
 
     // T is the value type
@@ -56,7 +58,7 @@ Example:
 
     await hasValue.andThen(async (value) => Some(value * 2)).promise // Some(2)
     await hasValue.andThen(async (value) => None).promise // None
-    await noValue.andThen(async (value) => Ok(value * 2)).promise // None
+    await noValue.andThen(async (value) => Some(value * 2)).promise // None
 
 ``map()``
 ---------
@@ -74,7 +76,7 @@ Example:
 
 .. code-block:: typescript
 
-    let hasValue = Ok(1).toAsyncOption()
+    let hasValue = Some(1).toAsyncOption()
     let noValue = None.toAsyncOption()
 
     await hasValue.map(async (value) => value * 2).promise // Some(2)
@@ -132,12 +134,36 @@ Example:
 
 .. code-block:: typescript
 
-    promise: Promise<Result<T, E>>
+    promise: Promise<Option<T>>
 
-A promise that resolves to a synchronous result.
+A promise that resolves to a synchronous ``Option``.
 
-Await it to convert ``AsyncResult<T, E>`` to ``Result<T, E>``.
+You can await it to convert ``AsyncOption<T>`` to ``Option<T>``, but prefer
+awaiting ``AsyncOption`` directly (see: `then()`_). Only use this property
+if you need the underlying Promise for specific use cases.
 
+``then()``
+----------
+
+.. code-block:: typescript
+
+    then<TResult1 = Option<T>, TResult2 = never>(
+        onfulfilled?: ((value: Option<T>) => TResult1 | PromiseLike<TResult1>) | null,
+        onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null
+    ): Promise<TResult1 | TResult2>
+
+Makes ``AsyncOption`` awaitable by implementing the thenable interface.
+This allows you to use ``await`` directly on ``AsyncOption`` instances.
+
+See the `Promise.then() documentation <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then>`_
+for details on the thenable interface.
+
+Example:
+
+.. code-block:: typescript
+
+    const asyncOption = new AsyncOption(Some(42))
+    const option = await asyncOption // Returns Option<number>
 
 ``toResult()``
 --------------

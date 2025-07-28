@@ -13,7 +13,9 @@ export class AsyncOption<T> {
     /**
      * A promise that resolves to a synchronous ``Option``.
      *
-     * Await it to convert `AsyncOption<T>` to `Option<T>`.
+     * You can await it to convert `AsyncOption<T>` to `Option<T>`, but prefer
+     * awaiting `AsyncOption` directly (see: `then()`). Only use this property
+     * if you need the underlying Promise for specific use cases.
      */
     promise: Promise<Option<T>>;
 
@@ -40,7 +42,7 @@ export class AsyncOption<T> {
      *
      * await hasValue.andThen(async (value) => Some(value * 2)).promise // Some(2)
      * await hasValue.andThen(async (value) => None).promise // None
-     * await noValue.andThen(async (value) => Ok(value * 2)).promise // None
+     * await noValue.andThen(async (value) => Some(value * 2)).promise // None
      * ```
      */
     andThen<T2>(mapper: (val: T) => Option<T2> | Promise<Option<T2>> | AsyncOption<T2>): AsyncOption<T2> {
@@ -61,7 +63,7 @@ export class AsyncOption<T> {
      *
      * @example
      * ```typescript
-     * let hasValue = Ok(1).toAsyncOption()
+     * let hasValue = Some(1).toAsyncOption()
      * let noValue = None.toAsyncOption()
      *
      * await hasValue.map(async (value) => value * 2).promise // Some(2)
@@ -125,6 +127,29 @@ export class AsyncOption<T> {
      */
     toResult<E>(error: E): AsyncResult<T, E> {
         return new AsyncResult(this.promise.then((option) => option.toResult(error)));
+    }
+
+    /**
+     * Makes `AsyncOption` awaitable by implementing the thenable interface.
+     * This allows you to use `await` directly on `AsyncOption` instances.
+     *
+     * See the [Promise.then() documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then)
+     * for details on the thenable interface.
+     *
+     * @example
+     * ```typescript
+     * const asyncOption = new AsyncOption(Some(42))
+     * const option = await asyncOption // Returns Option<number>
+     *
+     * // Equivalent to:
+     * const option2 = await asyncOption.promise
+     * ```
+     */
+    then<TResult1 = Option<T>, TResult2 = never>(
+        onfulfilled?: ((value: Option<T>) => TResult1 | PromiseLike<TResult1>) | null,
+        onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | null,
+    ): Promise<TResult1 | TResult2> {
+        return this.promise.then(onfulfilled, onrejected);
     }
 
     private thenInternal<T2>(mapper: (option: Option<T>) => Promise<Option<T2>>): AsyncOption<T2> {

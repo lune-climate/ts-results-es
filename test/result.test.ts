@@ -359,6 +359,10 @@ test('andThen/orElse chaining regression', () => {
         return Ok({ name: 'T3' });
     }
 
+    // The orElse line used to produce this error:
+    //
+    // This expression is not callable.
+    // Each member of the union type ... has signatures, but none of those signatures are compatible with each other. (ts 2349)
     const test1 = foo1()
         .andThen(() => foo2())
         .orElse(() => foo3());
@@ -366,6 +370,7 @@ test('andThen/orElse chaining regression', () => {
     expect(test1).toEqual(Ok({ name: 'T2' }));
     eq<typeof test1, Ok<T2> | Ok<T3> | Err<E3>>(true);
 
+    // Test the opposite order too just to be sure
     const test2 = foo1()
         .orElse(() => foo2())
         .andThen(() => foo3());

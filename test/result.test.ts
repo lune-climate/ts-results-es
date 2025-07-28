@@ -328,6 +328,13 @@ test('unwrapOrElse', () => {
     expect(Err('bad error').unwrapOrElse((error) => ({ error }))).toEqual({ error: 'bad error' });
 });
 
+export function passNonEmptyArray<T>(array: T[]): Result<T[], string> {
+    if (array.length === 0) {
+        return Err('The array is empty')
+    }
+    return Ok(array)
+}
+
 test('andThen/orElse chaining regression', () => {
     // Based on this issue: https://github.com/lune-climate/ts-results-es/issues/197
     class T1 {
@@ -372,4 +379,7 @@ test('andThen/orElse chaining regression', () => {
 
     expect(test2).toEqual(Ok({ name: 'T3' }));
     eq<typeof test2, Ok<T3> | Err<E3> | Err<E2 | E3>>(true);
+
+    const y: Result<({ id: number } & { name: string } & { [key: string]: unknown })[], string> = Ok([{ id: 1, name: 'John' }]);
+    const z = y.andThen(passNonEmptyArray)
 });

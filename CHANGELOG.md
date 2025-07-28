@@ -1,3 +1,23 @@
+# 6.0.0
+
+Backwards incompatible:
+
+- Fixed `Result`'s `andThen` and `orElse` signatures to fix situations where they
+  couldn't be called (`This expression is not callable`). That comes at the cost of:
+
+  1. Reduced type narrowing when the input type is known to be `Ok` or `Err`.
+  2. Reduced type narrowing when the mapper function always returns `Ok` or
+     always returns `Err`. Possible workaround: use more appropriate methods like
+     `map` and `mapErr`.
+  3. Type inference failure when the mapper function is generic. The failure is visible
+     the `Ok` type being inferred as `unknown`. Workaround: instead of
+     `andThen(someGenericFunction)` use `andThen((v) => someGenericFunction(v))`.
+
+Added:
+
+- Made `AsyncOption` and `AsyncResult` awaitable - you can now use `await asyncResult`
+  instead of `await asyncResult.promise`.
+
 # 5.0.1
 
 Fixed:

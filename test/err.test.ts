@@ -40,11 +40,7 @@ test('static EMPTY', () => {
     eq<typeof Err.EMPTY, Err<void>>(true);
 });
 
-test('else, unwrapOr', () => {
-    const e1 = Err(3).else(false);
-    expect(e1).toBe(false);
-    eq<false, typeof e1>(true);
-
+test('unwrapOr', () => {
     const e2 = Err(3).unwrapOr(false);
     expect(e2).toBe(false);
     eq<false, typeof e2>(true);

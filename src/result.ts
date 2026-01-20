@@ -70,14 +70,6 @@ interface BaseResult<T, E> extends Iterable<T> {
     /**
      * Returns the contained `Ok` value or a provided default.
      *
-     *  @see unwrapOr
-     *  @deprecated in favor of unwrapOr
-     */
-    else<T2>(val: T2): T | T2;
-
-    /**
-     * Returns the contained `Ok` value or a provided default.
-     *
      *  (This is the `unwrap_or` in rust)
      */
     unwrapOr<T2>(val: T2): T | T2;
@@ -219,14 +211,6 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         this._stack = stackLines.join('\n');
     }
 
-    /**
-     * @deprecated in favor of unwrapOr
-     * @see unwrapOr
-     */
-    else<T2>(val: T2): T2 {
-        return val;
-    }
-
     unwrapOr<T2>(val: T2): T2 {
         return val;
     }
@@ -334,14 +318,6 @@ export class OkImpl<T> implements BaseResult<T, never> {
         }
 
         this.value = val;
-    }
-
-    /**
-     * @see unwrapOr
-     * @deprecated in favor of unwrapOr
-     */
-    else(_val: unknown): T {
-        return this.value;
     }
 
     unwrapOr(_val: unknown): T {

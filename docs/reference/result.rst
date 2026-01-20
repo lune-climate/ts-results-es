@@ -118,6 +118,171 @@ Example:
 
     let [numbers, errors] = Result.partition(results); // [ [1, 2], ['error1', 'error2'] ]
 
+``Err.EMPTY``
+-------------
+
+.. code-block:: typescript
+
+    static readonly EMPTY: Err<void>
+
+A static ``Err`` instance containing ``undefined``. Useful when you need to represent
+a failure without a meaningful error value.
+
+Example:
+
+.. code-block:: typescript
+
+    import { Err } from 'ts-results-es'
+
+    // Signal that an operation failed without specific error details
+    function checkPreconditions(): Result<void, void> {
+        if (!isReady()) {
+            return Err.EMPTY
+        }
+        return Ok.EMPTY
+    }
+
+``Ok.EMPTY``
+------------
+
+.. code-block:: typescript
+
+    static readonly EMPTY: Ok<void>
+
+A static ``Ok`` instance containing ``undefined``. Useful when you need to represent
+a success without a meaningful value.
+
+Example:
+
+.. code-block:: typescript
+
+    import { Ok, Err, Result } from 'ts-results-es'
+
+    // Signal that an operation succeeded without returning data
+    function saveToDatabase(data: Data): Result<void, DbError> {
+        try {
+            db.save(data)
+            return Ok.EMPTY
+        } catch (e) {
+            return Err(new DbError(e))
+        }
+    }
+
+    // Use in validation that only cares about pass/fail
+    function validateInput(input: string): Result<void, ValidationError> {
+        if (input.length === 0) {
+            return Err(new ValidationError('Input required'))
+        }
+        return Ok.EMPTY
+    }
+
+``ResultErrType``
+-----------------
+
+.. code-block:: typescript
+
+    type ResultErrType<T extends Result<any, any>>
+
+A utility type that extracts the ``Err`` value type from a ``Result``.
+
+Example:
+
+.. code-block:: typescript
+
+    import { Result, ResultErrType } from 'ts-results-es'
+
+    // Extract error type from a function's return type
+    declare function fetchUser(id: string): Result<User, ApiError | NetworkError>
+    type FetchErrors = ResultErrType<ReturnType<typeof fetchUser>>
+    // ApiError | NetworkError
+
+    // Build error handlers that match a Result's error type
+    function handleError<R extends Result<any, any>>(
+        result: R,
+        handler: (error: ResultErrType<R>) => void
+    ): void {
+        if (result.isErr()) handler(result.error)
+    }
+
+``ResultErrTypes``
+------------------
+
+.. code-block:: typescript
+
+    type ResultErrTypes<T extends Result<any, any>[]>
+
+A utility type that extracts the ``Err`` value types from a tuple of ``Result``'s,
+producing a tuple of the error types.
+
+Example:
+
+.. code-block:: typescript
+
+    import { Result, Err } from 'ts-results-es'
+
+    // Extracting error types from a tuple of Results
+    type FetchResults = [Result<Data, NetworkError>, Result<Data, CacheError>]
+    type AllErrors = ResultErrTypes<FetchResults> // [NetworkError, CacheError]
+
+    // The error type of Result.any() when all fail is ResultErrTypes<T>
+    const primary = Err(new NetworkError('timeout'))
+    const fallback = Err(new CacheError('miss'))
+    const result = Result.any([primary, fallback])
+    // If all fail: result.error is [NetworkError, CacheError]
+
+``ResultOkType``
+----------------
+
+.. code-block:: typescript
+
+    type ResultOkType<T extends Result<any, any>>
+
+A utility type that extracts the ``Ok`` value type from a ``Result``.
+
+Example:
+
+.. code-block:: typescript
+
+    import { Result, ResultOkType } from 'ts-results-es'
+
+    // Extract success type from a function's return type
+    declare function parseConfig(raw: string): Result<Config, ParseError>
+    type ParsedConfig = ResultOkType<ReturnType<typeof parseConfig>> // Config
+
+    // Useful for typing default values in generic Result handlers
+    function unwrapOr<R extends Result<any, any>>(
+        result: R,
+        defaultValue: ResultOkType<R>
+    ): ResultOkType<R> {
+        return result.isOk() ? result.value : defaultValue
+    }
+
+``ResultOkTypes``
+-----------------
+
+.. code-block:: typescript
+
+    type ResultOkTypes<T extends Result<any, any>[]>
+
+A utility type that extracts the ``Ok`` value types from a tuple of ``Result``'s,
+producing a tuple of the inner types.
+
+Example:
+
+.. code-block:: typescript
+
+    import { Result, Ok, Err } from 'ts-results-es'
+
+    // Extracting Ok types from a tuple of Results
+    type LoadResults = [Result<User, Error>, Result<string[], Error>]
+    type AllValues = ResultOkTypes<LoadResults> // [User, string[]]
+
+    // The success type of Result.all() is ResultOkTypes<T>
+    const user = Ok({ name: 'Alice' })
+    const permissions = Ok(['read', 'write'])
+    const result = Result.all([user, permissions])
+    // result.value is [{name: string}, string[]]
+
 ``error``
 ---------
 
@@ -451,6 +616,93 @@ Example:
     ) // => 'OK', nothing printed
 
     Err('A03B').unwrapOrElse((error) => `UGH, got ${error}`) // => 'UGH, got A03B'
+
+``wrap()``
+----------
+
+.. code-block:: typescript
+
+    static wrap<T, E = unknown>(op: () => T): Result<T, E>
+
+Wraps an operation that may throw an error (``try-catch`` style) into a ``Result``.
+
+This is useful for converting exception-based code into ``Result``-based code.
+
+Example:
+
+.. code-block:: typescript
+
+    import { Result } from 'ts-results-es'
+
+    const result = Result.wrap(() => JSON.parse('{"valid": "json"}'))
+    // result is Ok({ valid: 'json' })
+
+    const failed = Result.wrap(() => JSON.parse('not json'))
+    // failed is Err(SyntaxError: ...)
+
+    // With explicit error type
+    const typed = Result.wrap<Config, ConfigError>(() => loadConfig())
+
+``wrapAsync()``
+---------------
+
+.. code-block:: typescript
+
+    static wrapAsync<T, E = unknown>(op: () => Promise<T>): Promise<Result<T, E>>
+
+Wraps an async operation that may throw an error (``try-catch`` style) into a ``Result``.
+
+This is useful for converting promise-based code that may reject into ``Result``-based code.
+
+Example:
+
+.. code-block:: typescript
+
+    import { Result } from 'ts-results-es'
+
+    const result = await Result.wrapAsync(() => fetch('/api/data').then(r => r.json()))
+    // result is Ok(data) or Err(error)
+
+    // With explicit error type
+    const typed = await Result.wrapAsync<User, ApiError>(() => fetchUser(id))
+
+    // Using with async/await
+    async function fetchData(): Promise<Result<Data, Error>> {
+        return Result.wrapAsync(async () => {
+            const response = await fetch('/api')
+            if (!response.ok) throw new Error('Failed')
+            return response.json()
+        })
+    }
+
+Iterable
+--------
+
+``Result`` implements the ``Iterable`` interface, allowing you to use it in ``for...of`` loops
+and with spread syntax.
+
+- ``Ok<T>`` yields its contained value once
+- ``Err<E>`` yields nothing (empty iterator)
+
+Example:
+
+.. code-block:: typescript
+
+    for (const value of Ok(42)) {
+        console.log(value); // 42
+    }
+
+    for (const value of Err('error')) {
+        console.log(value); // never executes
+    }
+
+    // Spread syntax
+    [...Ok(1)] // [1]
+    [...Err('oops')] // []
+
+    // Collecting values from multiple Results
+    const results = [Ok(1), Err('bad'), Ok(3)];
+    const values = results.flatMap(res => [...res]); // [1, 3]
 
 
 .. _cause: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause

@@ -20,6 +20,79 @@ Construction:
     const some = Some('some value')
     // None is a singleton, no construction necessary
 
+``all()``
+---------
+
+.. code-block:: typescript
+
+    static all<T extends Option<any>[]>(...options: T): Option<OptionSomeTypes<T>>
+
+Parse a set of ``Option``'s, returning an array of all ``Some`` values.
+Short circuits with the first ``None`` found, if any.
+
+Example:
+
+.. code-block:: typescript
+
+    let options: Option<number>[] = [Some(1), Some(2), Some(3)];
+
+    let result = Option.all(...options); // Option<number[]>
+
+    result.unwrap(); // [1, 2, 3]
+
+    // Short-circuits on first None
+    Option.all(Some(1), None, Some(3)); // None
+
+``any()``
+---------
+
+.. code-block:: typescript
+
+    static any<T extends Option<any>[]>(...options: T): Option<OptionSomeTypes<T>[number]>
+
+Parse a set of ``Option``'s, short-circuits when an input value is ``Some``.
+If no ``Some`` is found, returns ``None``.
+
+Example:
+
+.. code-block:: typescript
+
+    Option.any(None, Some(1), Some(2)); // Some(1)
+    Option.any(None, None, Some(3)); // Some(3)
+    Option.any(None, None, None); // None
+
+``Some.EMPTY``
+--------------
+
+.. code-block:: typescript
+
+    static readonly EMPTY: Some<void>
+
+A static ``Some`` instance containing ``undefined``. Useful when you need to represent
+a successful presence without a meaningful value.
+
+Example:
+
+.. code-block:: typescript
+
+    import { Some } from 'ts-results-es'
+
+    // Signal that an operation succeeded without returning data
+    function ensureDirectoryExists(path: string): Option<void> {
+        if (directoryExists(path)) {
+            return Some.EMPTY
+        }
+        return None
+    }
+
+    // Use in validation that only cares about pass/fail
+    function validateConfig(config: Config): Option<void> {
+        if (isValid(config)) {
+            return Some.EMPTY
+        }
+        return None
+    }
+
 ``andThen()``
 -------------
 
@@ -140,7 +213,59 @@ Example:
 .. code-block:: typescript
 
     Some(1).orElse(() => Some(2)) // => Some(1)
-    None.orElse(() => Some(2)) // => Some(2) 
+    None.orElse(() => Some(2)) // => Some(2)
+
+``OptionSomeType``
+------------------
+
+.. code-block:: typescript
+
+    type OptionSomeType<T extends Option<any>>
+
+A utility type that extracts the ``Some`` value type from an ``Option``.
+
+Example:
+
+.. code-block:: typescript
+
+    import { Option, OptionSomeType } from 'ts-results-es'
+
+    // Extract value type from a function's return type
+    declare function findUser(id: string): Option<User>
+    type FoundUser = OptionSomeType<ReturnType<typeof findUser>> // User
+
+    // Useful in generic functions that unwrap Options
+    function unwrapOr<T extends Option<any>>(
+        opt: T,
+        defaultValue: OptionSomeType<T>
+    ): OptionSomeType<T> {
+        return opt.isSome() ? opt.value : defaultValue
+    }
+
+``OptionSomeTypes``
+-------------------
+
+.. code-block:: typescript
+
+    type OptionSomeTypes<T extends Option<any>[]>
+
+A utility type that extracts the ``Some`` value types from a tuple of ``Option``'s,
+producing a tuple of the inner types.
+
+Example:
+
+.. code-block:: typescript
+
+    import { Option, Some, None } from 'ts-results-es'
+
+    // Extracting types from a tuple of Options
+    type UserOptions = [Option<string>, Option<number>, Option<boolean>]
+    type UserValues = OptionSomeTypes<UserOptions> // [string, number, boolean]
+
+    // The return type of Option.all() is Option<OptionSomeTypes<T>>
+    const name = Some('Alice')
+    const age = Some(30)
+    const result = Option.all(name, age) // Option<[string, number]>
 
 .. _toAsyncOption:
 
@@ -212,6 +337,35 @@ Example:
     ) // => 'OK', nothing printed
 
     None.unwrapOrElse(() => 'UGH') // => 'UGH'
+
+Iterable
+--------
+
+``Option`` implements the ``Iterable`` interface, allowing you to use it in ``for...of`` loops
+and with spread syntax.
+
+- ``Some<T>`` yields its contained value once
+- ``None`` yields nothing (empty iterator)
+
+Example:
+
+.. code-block:: typescript
+
+    for (const value of Some(42)) {
+        console.log(value); // 42
+    }
+
+    for (const value of None) {
+        console.log(value); // never executes
+    }
+
+    // Spread syntax
+    [...Some(1)] // [1]
+    [...None] // []
+
+    // Collecting values from multiple Options
+    const options = [Some(1), None, Some(3)];
+    const values = options.flatMap(opt => [...opt]); // [1, 3]
 
 
 .. _cause: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause

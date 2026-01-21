@@ -73,23 +73,7 @@ Example:
 
 .. code-block:: typescript
 
-    import { Some } from 'ts-results-es'
-
-    // Signal that an operation succeeded without returning data
-    function ensureDirectoryExists(path: string): Option<void> {
-        if (directoryExists(path)) {
-            return Some.EMPTY
-        }
-        return None
-    }
-
-    // Use in validation that only cares about pass/fail
-    function validateConfig(config: Config): Option<void> {
-        if (isValid(config)) {
-            return Some.EMPTY
-        }
-        return None
-    }
+    const x: Option<void> = Some.EMPTY
 
 ``andThen()``
 -------------
@@ -226,19 +210,8 @@ Example:
 
 .. code-block:: typescript
 
-    import { Option, OptionSomeType } from 'ts-results-es'
-
-    // Extract value type from a function's return type
-    declare function findUser(id: string): Option<User>
-    type FoundUser = OptionSomeType<ReturnType<typeof findUser>> // User
-
-    // Useful in generic functions that unwrap Options
-    function unwrapOr<T extends Option<any>>(
-        opt: T,
-        defaultValue: OptionSomeType<T>
-    ): OptionSomeType<T> {
-        return opt.isSome() ? opt.value : defaultValue
-    }
+    type Input = Option<string>
+    type Output = OptionSomeType<Input> // string
 
 ``OptionSomeTypes``
 -------------------
@@ -254,16 +227,8 @@ Example:
 
 .. code-block:: typescript
 
-    import { Option, Some, None } from 'ts-results-es'
-
-    // Extracting types from a tuple of Options
-    type UserOptions = [Option<string>, Option<number>, Option<boolean>]
-    type UserValues = OptionSomeTypes<UserOptions> // [string, number, boolean]
-
-    // The return type of Option.all() is Option<OptionSomeTypes<T>>
-    const name = Some('Alice')
-    const age = Some(30)
-    Option.all(name, age) // Some(['Alice', 30]), type: Option<[string, number]>
+    type Input = [Option<string>, Option<number>, Option<boolean>]
+    type Output = OptionSomeTypes<Input> // [string, number, boolean]
 
 .. _toAsyncOption:
 
@@ -357,11 +322,9 @@ Example:
         console.log(value); // never executes
     }
 
-    // Spread syntax
     [...Some(1)] // [1], type: number[]
     [...None] // [], type: never[]
 
-    // Collecting values from multiple Options
     const options = [Some(1), None, Some(3)];
     options.flatMap(opt => [...opt]); // [1, 3], type: number[]
 

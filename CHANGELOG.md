@@ -3,7 +3,7 @@
 Backwards incompatible:
 
 - Removed the `Result.else` method, use `Result.unwrapOr` instead.
-- Removed the `Some.safeUnwrap` and `Ok.safeUnwrap` methods, the
+- Removed the `Some.safeUnwrap` and `Ok.safeUnwrap` methods, use the
   `value` property instead.
 
 # 6.0.0

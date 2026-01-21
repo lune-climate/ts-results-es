@@ -35,11 +35,11 @@ Example:
 .. code-block:: typescript
 
     let options: Option<number>[] = [Some(1), Some(2), Some(3)];
-
     Option.all(...options); // Some([1, 2, 3]), type: Option<number[]>
 
     // Short-circuits on first None
-    Option.all(Some(1), None, Some(3)); // None, type: Option<number>
+    let optionsWithNone: Option<number>[] = [Some(1), None, Some(3)];
+    Option.all(...optionsWithNone); // None, type: Option<number[]>
 
 ``any()``
 ---------

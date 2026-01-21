@@ -118,6 +118,104 @@ Example:
 
     let [numbers, errors] = Result.partition(results); // [ [1, 2], ['error1', 'error2'] ]
 
+``Err.EMPTY``
+-------------
+
+.. code-block:: typescript
+
+    static readonly EMPTY: Err<void>
+
+A static ``Err`` instance containing ``undefined``. Useful when you need to represent
+a failure without a meaningful error value.
+
+Example:
+
+.. code-block:: typescript
+
+    const x: Result<string, void> = Err.EMPTY
+
+``Ok.EMPTY``
+------------
+
+.. code-block:: typescript
+
+    static readonly EMPTY: Ok<void>
+
+A static ``Ok`` instance containing ``undefined``. Useful when you need to represent
+a success without a meaningful value.
+
+Example:
+
+.. code-block:: typescript
+
+    const x: Result<void, string> = Ok.EMPTY
+
+``ResultErrType``
+-----------------
+
+.. code-block:: typescript
+
+    type ResultErrType<T extends Result<any, any>>
+
+A utility type that extracts the ``Err`` value type from a ``Result``.
+
+Example:
+
+.. code-block:: typescript
+
+    type Input = Result<string, Error>
+    type Output = ResultErrType<Input> // Error
+
+``ResultErrTypes``
+------------------
+
+.. code-block:: typescript
+
+    type ResultErrTypes<T extends Result<any, any>[]>
+
+A utility type that extracts the ``Err`` value types from a tuple of ``Result``'s,
+producing a tuple of the error types.
+
+Example:
+
+.. code-block:: typescript
+
+    type Input = [Result<string, Error>, Result<number, Error>]
+    type Output = ResultErrTypes<Input> // [Error, Error]
+
+``ResultOkType``
+----------------
+
+.. code-block:: typescript
+
+    type ResultOkType<T extends Result<any, any>>
+
+A utility type that extracts the ``Ok`` value type from a ``Result``.
+
+Example:
+
+.. code-block:: typescript
+
+    type Input = Result<string, Error>
+    type Output = ResultOkType<Input> // string
+
+``ResultOkTypes``
+-----------------
+
+.. code-block:: typescript
+
+    type ResultOkTypes<T extends Result<any, any>[]>
+
+A utility type that extracts the ``Ok`` value types from a tuple of ``Result``'s,
+producing a tuple of the inner types.
+
+Example:
+
+.. code-block:: typescript
+
+    type Input = [Result<string, Error>, Result<number, Error>]
+    type Output = ResultOkTypes<Input> // [string, number]
+
 ``error``
 ---------
 
@@ -451,6 +549,69 @@ Example:
     ) // => 'OK', nothing printed
 
     Err('A03B').unwrapOrElse((error) => `UGH, got ${error}`) // => 'UGH, got A03B'
+
+``wrap()``
+----------
+
+.. code-block:: typescript
+
+    static wrap<T, E = unknown>(op: () => T): Result<T, E>
+
+Wraps an operation that may throw an error (``try-catch`` style) into a ``Result``.
+
+This is useful for converting exception-based code into ``Result``-based code.
+
+Example:
+
+.. code-block:: typescript
+
+    Result.wrap(() => JSON.parse('{"valid": "json"}')) // Ok({ valid: 'json' }), type: Result<any, unknown>
+
+    Result.wrap(() => JSON.parse('not json')) // Err(SyntaxError: ...), type: Result<any, unknown>
+
+``wrapAsync()``
+---------------
+
+.. code-block:: typescript
+
+    static wrapAsync<T, E = unknown>(op: () => Promise<T>): Promise<Result<T, E>>
+
+Wraps an async operation that may throw an error (``try-catch`` style) into a ``Result``.
+
+This is useful for converting promise-based code that may reject into ``Result``-based code.
+
+Example:
+
+.. code-block:: typescript
+
+    await Result.wrapAsync(() => fetch('/api/data').then(r => r.json())) // Ok(data) or Err(error), type: Result<any, unknown>
+
+Iterable
+--------
+
+``Result`` implements the ``Iterable`` interface, allowing you to use it in ``for...of`` loops
+and with spread syntax.
+
+- ``Ok<T>`` yields its contained value once
+- ``Err<E>`` yields nothing (empty iterator)
+
+Example:
+
+.. code-block:: typescript
+
+    for (const value of Ok(42)) {
+        console.log(value); // 42
+    }
+
+    for (const value of Err('error')) {
+        console.log(value); // never executes
+    }
+
+    [...Ok(1)] // [1], type: number[]
+    [...Err('oops')] // [], type: never[]
+
+    const results = [Ok(1), Err('bad'), Ok(3)];
+    results.flatMap(res => [...res]); // [1, 3], type: number[]
 
 
 .. _cause: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause

@@ -20,6 +20,61 @@ Construction:
     const some = Some('some value')
     // None is a singleton, no construction necessary
 
+``all()``
+---------
+
+.. code-block:: typescript
+
+    static all<T extends Option<any>[]>(...options: T): Option<OptionSomeTypes<T>>
+
+Parse a set of ``Option``'s, returning an array of all ``Some`` values.
+Short circuits with the first ``None`` found, if any.
+
+Example:
+
+.. code-block:: typescript
+
+    let options: Option<number>[] = [Some(1), Some(2), Some(3)];
+    Option.all(...options); // Some([1, 2, 3]), type: Option<number[]>
+
+    // Short-circuits on first None
+    let optionsWithNone: Option<number>[] = [Some(1), None, Some(3)];
+    Option.all(...optionsWithNone); // None, type: Option<number[]>
+
+``any()``
+---------
+
+.. code-block:: typescript
+
+    static any<T extends Option<any>[]>(...options: T): Option<OptionSomeTypes<T>[number]>
+
+Parse a set of ``Option``'s, short-circuits when an input value is ``Some``.
+If no ``Some`` is found, returns ``None``.
+
+Example:
+
+.. code-block:: typescript
+
+    Option.any(None, Some(1), Some(2)); // Some(1), type: Option<number>
+    Option.any(None, None, Some(3)); // Some(3), type: Option<number>
+    Option.any(None, None, None); // None, type: Option<never>
+
+``Some.EMPTY``
+--------------
+
+.. code-block:: typescript
+
+    static readonly EMPTY: Some<void>
+
+A static ``Some`` instance containing ``undefined``. Useful when you need to represent
+a successful presence without a meaningful value.
+
+Example:
+
+.. code-block:: typescript
+
+    const x: Option<void> = Some.EMPTY
+
 ``andThen()``
 -------------
 
@@ -140,7 +195,40 @@ Example:
 .. code-block:: typescript
 
     Some(1).orElse(() => Some(2)) // => Some(1)
-    None.orElse(() => Some(2)) // => Some(2) 
+    None.orElse(() => Some(2)) // => Some(2)
+
+``OptionSomeType``
+------------------
+
+.. code-block:: typescript
+
+    type OptionSomeType<T extends Option<any>>
+
+A utility type that extracts the ``Some`` value type from an ``Option``.
+
+Example:
+
+.. code-block:: typescript
+
+    type Input = Option<string>
+    type Output = OptionSomeType<Input> // string
+
+``OptionSomeTypes``
+-------------------
+
+.. code-block:: typescript
+
+    type OptionSomeTypes<T extends Option<any>[]>
+
+A utility type that extracts the ``Some`` value types from a tuple of ``Option``'s,
+producing a tuple of the inner types.
+
+Example:
+
+.. code-block:: typescript
+
+    type Input = [Option<string>, Option<number>, Option<boolean>]
+    type Output = OptionSomeTypes<Input> // [string, number, boolean]
 
 .. _toAsyncOption:
 
@@ -212,6 +300,33 @@ Example:
     ) // => 'OK', nothing printed
 
     None.unwrapOrElse(() => 'UGH') // => 'UGH'
+
+Iterable
+--------
+
+``Option`` implements the ``Iterable`` interface, allowing you to use it in ``for...of`` loops
+and with spread syntax.
+
+- ``Some<T>`` yields its contained value once
+- ``None`` yields nothing (empty iterator)
+
+Example:
+
+.. code-block:: typescript
+
+    for (const value of Some(42)) {
+        console.log(value); // 42
+    }
+
+    for (const value of None) {
+        console.log(value); // never executes
+    }
+
+    [...Some(1)] // [1], type: number[]
+    [...None] // [], type: never[]
+
+    const options = [Some(1), None, Some(3)];
+    options.flatMap(opt => [...opt]); // [1, 3], type: number[]
 
 
 .. _cause: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause

@@ -36,12 +36,10 @@ Example:
 
     let options: Option<number>[] = [Some(1), Some(2), Some(3)];
 
-    let result = Option.all(...options); // Option<number[]>
-
-    result.unwrap(); // [1, 2, 3]
+    Option.all(...options); // Some([1, 2, 3]), type: Option<number[]>
 
     // Short-circuits on first None
-    Option.all(Some(1), None, Some(3)); // None
+    Option.all(Some(1), None, Some(3)); // None, type: Option<number>
 
 ``any()``
 ---------
@@ -57,9 +55,9 @@ Example:
 
 .. code-block:: typescript
 
-    Option.any(None, Some(1), Some(2)); // Some(1)
-    Option.any(None, None, Some(3)); // Some(3)
-    Option.any(None, None, None); // None
+    Option.any(None, Some(1), Some(2)); // Some(1), type: Option<number>
+    Option.any(None, None, Some(3)); // Some(3), type: Option<number>
+    Option.any(None, None, None); // None, type: Option<never>
 
 ``Some.EMPTY``
 --------------
@@ -265,7 +263,7 @@ Example:
     // The return type of Option.all() is Option<OptionSomeTypes<T>>
     const name = Some('Alice')
     const age = Some(30)
-    const result = Option.all(name, age) // Option<[string, number]>
+    Option.all(name, age) // Some(['Alice', 30]), type: Option<[string, number]>
 
 .. _toAsyncOption:
 
@@ -360,12 +358,12 @@ Example:
     }
 
     // Spread syntax
-    [...Some(1)] // [1]
-    [...None] // []
+    [...Some(1)] // [1], type: number[]
+    [...None] // [], type: never[]
 
     // Collecting values from multiple Options
     const options = [Some(1), None, Some(3)];
-    const values = options.flatMap(opt => [...opt]); // [1, 3]
+    options.flatMap(opt => [...opt]); // [1, 3], type: number[]
 
 
 .. _cause: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause

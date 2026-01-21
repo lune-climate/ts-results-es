@@ -227,8 +227,7 @@ Example:
     // The error type of Result.any() when all fail is ResultErrTypes<T>
     const primary = Err(new NetworkError('timeout'))
     const fallback = Err(new CacheError('miss'))
-    const result = Result.any([primary, fallback])
-    // If all fail: result.error is [NetworkError, CacheError]
+    Result.any([primary, fallback]) // Err([NetworkError, CacheError]), type: Result<never, [NetworkError, CacheError]>
 
 ``ResultOkType``
 ----------------
@@ -280,8 +279,7 @@ Example:
     // The success type of Result.all() is ResultOkTypes<T>
     const user = Ok({ name: 'Alice' })
     const permissions = Ok(['read', 'write'])
-    const result = Result.all([user, permissions])
-    // result.value is [{name: string}, string[]]
+    Result.all([user, permissions]) // Ok([{ name: 'Alice' }, ['read', 'write']]), type: Result<[{ name: string }, string[]], never>
 
 ``error``
 ---------
@@ -634,14 +632,12 @@ Example:
 
     import { Result } from 'ts-results-es'
 
-    const result = Result.wrap(() => JSON.parse('{"valid": "json"}'))
-    // result is Ok({ valid: 'json' })
+    Result.wrap(() => JSON.parse('{"valid": "json"}')) // Ok({ valid: 'json' }), type: Result<any, unknown>
 
-    const failed = Result.wrap(() => JSON.parse('not json'))
-    // failed is Err(SyntaxError: ...)
+    Result.wrap(() => JSON.parse('not json')) // Err(SyntaxError: ...), type: Result<any, unknown>
 
     // With explicit error type
-    const typed = Result.wrap<Config, ConfigError>(() => loadConfig())
+    Result.wrap<Config, ConfigError>(() => loadConfig()) // Ok(...) or Err(...), type: Result<Config, ConfigError>
 
 ``wrapAsync()``
 ---------------
@@ -660,11 +656,10 @@ Example:
 
     import { Result } from 'ts-results-es'
 
-    const result = await Result.wrapAsync(() => fetch('/api/data').then(r => r.json()))
-    // result is Ok(data) or Err(error)
+    await Result.wrapAsync(() => fetch('/api/data').then(r => r.json())) // Ok(data) or Err(error), type: Result<any, unknown>
 
     // With explicit error type
-    const typed = await Result.wrapAsync<User, ApiError>(() => fetchUser(id))
+    await Result.wrapAsync<User, ApiError>(() => fetchUser(id)) // Ok(...) or Err(...), type: Result<User, ApiError>
 
     // Using with async/await
     async function fetchData(): Promise<Result<Data, Error>> {
@@ -697,12 +692,12 @@ Example:
     }
 
     // Spread syntax
-    [...Ok(1)] // [1]
-    [...Err('oops')] // []
+    [...Ok(1)] // [1], type: number[]
+    [...Err('oops')] // [], type: never[]
 
     // Collecting values from multiple Results
     const results = [Ok(1), Err('bad'), Ok(3)];
-    const values = results.flatMap(res => [...res]); // [1, 3]
+    results.flatMap(res => [...res]); // [1, 3], type: number[]
 
 
 .. _cause: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause

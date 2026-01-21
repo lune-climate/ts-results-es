@@ -379,19 +379,6 @@ export class OkImpl<T> implements BaseResult<T, never> {
         return Some(this.value);
     }
 
-    /**
-     * Returns the contained `Ok` value, but never throws.
-     * Unlike `unwrap()`, this method doesn't throw and is only callable on an Ok<T>
-     *
-     * Therefore, it can be used instead of `unwrap()` as a maintainability safeguard
-     * that will fail to compile if the error type of the Result is later changed to an error that can actually occur.
-     *
-     * (this is the `into_ok()` in rust)
-     */
-    safeUnwrap(): T {
-        return this.value;
-    }
-
     toString(): string {
         return `Ok(${toString(this.value)})`;
     }

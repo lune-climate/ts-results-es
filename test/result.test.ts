@@ -232,32 +232,6 @@ test('Result.partition', async () => {
     eq<typeof all5, [(number | boolean)[], (symbol | Error)[]]>(true);
 });
 
-test('safeUnwrap', () => {
-    const ok1 = new Ok(3).safeUnwrap();
-    expect(ok1).toEqual(3);
-    eq<typeof ok1, number>(true);
-
-    const err = new Err('hi');
-    const result = new Ok(1) as Result<number, string>;
-
-    expect(() => {
-        // @ts-expect-error
-        err.safeUnwrap();
-    }).toThrowError();
-
-    // @ts-expect-error
-    result.safeUnwrap();
-
-    if (result.isOk()) {
-        const val = result.safeUnwrap();
-        eq<typeof val, number>(true);
-        expect(val).toEqual(1);
-    } else {
-        // @ts-expect-error
-        result.safeUnwrap();
-    }
-});
-
 test('Issue #24', () => {
     const getStatus = (payload: boolean): Result<boolean, Error> => {
         if (payload) {

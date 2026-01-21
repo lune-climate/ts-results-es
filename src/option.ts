@@ -280,19 +280,6 @@ class SomeImpl<T> implements BaseOption<T> {
         return new AsyncOption(this);
     }
 
-    /**
-     * Returns the contained `Some` value, but never throws.
-     * Unlike `unwrap()`, this method doesn't throw and is only callable on an Some<T>
-     *
-     * Therefore, it can be used instead of `unwrap()` as a maintainability safeguard
-     * that will fail to compile if the type of the Option is later changed to a None that can actually occur.
-     *
-     * (this is the `into_Some()` in rust)
-     */
-    safeUnwrap(): T {
-        return this.value;
-    }
-
     toString(): string {
         return `Some(${toString(this.value)})`;
     }

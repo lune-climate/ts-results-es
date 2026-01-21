@@ -61,7 +61,6 @@ test('unwrap', () => {
     expect(someString.unwrap()).toBe('foo');
     expect(someString.expect('msg')).toBe('foo');
     expect(someString.unwrapOr('bar')).toBe('foo');
-    expect(someString.safeUnwrap()).toBe('foo');
     expect(() => None.unwrap()).toThrow(/Tried to unwrap None/);
     expect(() => None.expect('foobar')).toThrow(/foobar/);
     expect(None.unwrapOr('honk')).toBe('honk');

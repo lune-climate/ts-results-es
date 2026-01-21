@@ -2,7 +2,7 @@
 
 Backwards incompatible:
 
-- Removed the ``Result.else`` method, use ``Result.unwrapOr`` instead.
+- Removed the `Result.else` method, use `Result.unwrapOr` instead.
 
 # 6.0.0
 

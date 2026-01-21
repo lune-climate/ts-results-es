@@ -2,9 +2,9 @@
 
 Backwards incompatible:
 
-- Removed the ``Result.else`` method, use ``Result.unwrapOr`` instead.
-- Removed the ``Some.safeUnwrap`` and ``Ok.safeUnwrap`` methods, the
-  ``value`` property instead.
+- Removed the `Result.else` method, use `Result.unwrapOr` instead.
+- Removed the `Some.safeUnwrap` and `Ok.safeUnwrap` methods, the
+  `value` property instead.
 
 # 6.0.0
 

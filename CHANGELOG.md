@@ -6,6 +6,16 @@ Backwards incompatible:
 - Removed the `Some.safeUnwrap` and `Ok.safeUnwrap` methods, use the
   `value` property instead.
 
+Added:
+
+- Added array parameter overloads for `Option.all` and `Option.any`,
+  allowing `Option.all([a, b, c])` instead of `Option.all(a, b, c)`.
+
+Deprecated:
+
+- The parameter spread variants of `Option.all` and `Option.any` are now
+  deprecated. Use the new array parameter overloads instead.
+
 # 6.0.0
 
 Backwards incompatible:

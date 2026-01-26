@@ -9,15 +9,12 @@ build:
   os: ubuntu-22.04
   tools:
     python: "3.11"
-  # https://docs.readthedocs.io/en/stable/build-customization.html#install-dependencies-with-poetry
   jobs:
-    post_create_environment:
-      - pip install poetry
     post_install:
-      # Virtualenv management per
-      # https://docs.readthedocs.io/en/latest/build-customization.html#install-dependencies-with-poetry
-      # https://github.com/python-poetry/poetry/issues/9025#issuecomment-1963073941
-      - cd docs && VIRTUAL_ENV=$READTHEDOCS_VIRTUALENV_PATH poetry install
+      - asdf plugin add uv
+      - asdf install uv latest
+      - asdf global uv latest
+      - cd docs && uv sync --group docs
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:

@@ -315,8 +315,7 @@ export namespace Option {
         first?: T | T[number],
         ...rest: Option<any>[]
     ): Option<OptionSomeTypes<T>> {
-        const options: Option<any>[] =
-            first === undefined ? [] : Array.isArray(first) ? first : [first, ...rest];
+        const options: Option<any>[] = first === undefined ? [] : Array.isArray(first) ? first : [first, ...rest];
 
         const someOption = [];
         for (let option of options) {
@@ -347,8 +346,7 @@ export namespace Option {
         first?: T | T[number],
         ...rest: Option<any>[]
     ): Option<OptionSomeTypes<T>[number]> {
-        const options: Option<any>[] =
-            first === undefined ? [] : Array.isArray(first) ? first : [first, ...rest];
+        const options: Option<any>[] = first === undefined ? [] : Array.isArray(first) ? first : [first, ...rest];
 
         // short-circuits
         for (const option of options) {

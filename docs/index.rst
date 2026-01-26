@@ -13,6 +13,7 @@ The documentation will live here.
    :caption: User documentation:
 
    tutorials/index
+   how-to/index
    reference/index
    explanation/index
 

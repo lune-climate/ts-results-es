@@ -1,3 +1,5 @@
+.. _class-AsyncOption:
+
 AsyncOption
 ===========
 
@@ -36,6 +38,8 @@ Or you can use the :ref:`Option.toAsyncOption() <toAsyncOption>` method:
 
     const option3 = Some(1).toAsyncOption()
 
+.. _method-AsyncOption-andThen:
+
 ``andThen()``
 -------------
 
@@ -60,6 +64,8 @@ Example:
     await hasValue.andThen(async (value) => None).promise // None
     await noValue.andThen(async (value) => Some(value * 2)).promise // None
 
+.. _method-AsyncOption-map:
+
 ``map()``
 ---------
 
@@ -82,6 +88,8 @@ Example:
     await hasValue.map(async (value) => value * 2).promise // Some(2)
     await noValue.map(async (value) => value * 2).promise // None
 
+
+.. _method-AsyncOption-or:
 
 ``or()``
 --------
@@ -106,6 +114,7 @@ Example:
     await hasValue.or(Some(123)).promise // Some(1)
 
 .. _AsyncOption.orElse:
+.. _method-AsyncOption-orElse:
 
 ``orElse()``
 ------------
@@ -129,6 +138,8 @@ Example:
 
 
 
+.. _prop-AsyncOption-promise:
+
 ``promise``
 -----------
 
@@ -141,6 +152,8 @@ A promise that resolves to a synchronous ``Option``.
 You can await it to convert ``AsyncOption<T>`` to ``Option<T>``, but prefer
 awaiting ``AsyncOption`` directly (see: `then()`_). Only use this property
 if you need the underlying Promise for specific use cases.
+
+.. _method-AsyncOption-then:
 
 ``then()``
 ----------
@@ -164,6 +177,8 @@ Example:
 
     const asyncOption = new AsyncOption(Some(42))
     const option = await asyncOption // Returns Option<number>
+
+.. _method-AsyncOption-toResult:
 
 ``toResult()``
 --------------

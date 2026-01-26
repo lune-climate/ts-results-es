@@ -19,7 +19,7 @@ build:
       - cd docs && uv sync --group docs
     build:
       html:
-        - cd docs && uv run sphinx-build -T -b html docs $READTHEDOCS_OUTPUT/html
+        - cd docs && uv run sphinx-build -T -b html . $READTHEDOCS_OUTPUT/html
 
 # Build documentation in the "docs/" directory with Sphinx
 sphinx:

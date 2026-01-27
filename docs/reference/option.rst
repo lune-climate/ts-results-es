@@ -25,6 +25,10 @@ Construction:
 
 .. code-block:: typescript
 
+    // Preferred: pass an array
+    static all<T extends Option<any>[]>(options: T): Option<OptionSomeTypes<T>>
+
+    // Deprecated: spread arguments
     static all<T extends Option<any>[]>(...options: T): Option<OptionSomeTypes<T>>
 
 Parse a set of ``Option``'s, returning an array of all ``Some`` values.
@@ -35,17 +39,21 @@ Example:
 .. code-block:: typescript
 
     let options: Option<number>[] = [Some(1), Some(2), Some(3)];
-    Option.all(...options); // Some([1, 2, 3]), type: Option<number[]>
+    Option.all(options); // Some([1, 2, 3]), type: Option<number[]>
 
     // Short-circuits on first None
     let optionsWithNone: Option<number>[] = [Some(1), None, Some(3)];
-    Option.all(...optionsWithNone); // None, type: Option<number[]>
+    Option.all(optionsWithNone); // None, type: Option<number[]>
 
 ``any()``
 ---------
 
 .. code-block:: typescript
 
+    // Preferred: pass an array
+    static any<T extends Option<any>[]>(options: T): Option<OptionSomeTypes<T>[number]>
+
+    // Deprecated: spread arguments
     static any<T extends Option<any>[]>(...options: T): Option<OptionSomeTypes<T>[number]>
 
 Parse a set of ``Option``'s, short-circuits when an input value is ``Some``.
@@ -55,9 +63,11 @@ Example:
 
 .. code-block:: typescript
 
-    Option.any(None, Some(1), Some(2)); // Some(1), type: Option<number>
-    Option.any(None, None, Some(3)); // Some(3), type: Option<number>
-    Option.any(None, None, None); // None, type: Option<never>
+    let options: Option<number>[] = [None, Some(1), Some(2)];
+    Option.any(options); // Some(1), type: Option<number>
+
+    Option.any([None, None, Some(3)]); // Some(3), type: Option<number>
+    Option.any([None, None, None]); // None, type: Option<never>
 
 ``Some.EMPTY``
 --------------

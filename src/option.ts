@@ -300,9 +300,23 @@ export type OptionSomeTypes<T extends Option<any>[]> = {
 export namespace Option {
     /**
      * Parse a set of `Option`s, returning an array of all `Some` values.
-     * Short circuits with the first `None` found, if any
+     * Short circuits with the first `None` found, if any.
      */
-    export function all<T extends Option<any>[]>(...options: T): Option<OptionSomeTypes<T>> {
+    export function all<const T extends Option<any>[]>(options: T): Option<OptionSomeTypes<T>>;
+    /**
+     * Parse a set of `Option`s, returning an array of all `Some` values.
+     * Short circuits with the first `None` found, if any.
+     *
+     * @deprecated Pass an array instead of using spread arguments. This overload
+     * will be removed in a future version.
+     */
+    export function all<T extends Option<any>[]>(...options: T): Option<OptionSomeTypes<T>>;
+    export function all<T extends Option<any>[]>(
+        first?: T | T[number],
+        ...rest: Option<any>[]
+    ): Option<OptionSomeTypes<T>> {
+        const options: Option<any>[] = first === undefined ? [] : Array.isArray(first) ? first : [first, ...rest];
+
         const someOption = [];
         for (let option of options) {
             if (option.isSome()) {
@@ -319,7 +333,21 @@ export namespace Option {
      * Parse a set of `Option`s, short-circuits when an input value is `Some`.
      * If no `Some` is found, returns `None`.
      */
-    export function any<T extends Option<any>[]>(...options: T): Option<OptionSomeTypes<T>[number]> {
+    export function any<const T extends Option<any>[]>(options: T): Option<OptionSomeTypes<T>[number]>;
+    /**
+     * Parse a set of `Option`s, short-circuits when an input value is `Some`.
+     * If no `Some` is found, returns `None`.
+     *
+     * @deprecated Pass an array instead of using spread arguments. This overload
+     * will be removed in a future version.
+     */
+    export function any<T extends Option<any>[]>(...options: T): Option<OptionSomeTypes<T>[number]>;
+    export function any<T extends Option<any>[]>(
+        first?: T | T[number],
+        ...rest: Option<any>[]
+    ): Option<OptionSomeTypes<T>[number]> {
+        const options: Option<any>[] = first === undefined ? [] : Array.isArray(first) ? first : [first, ...rest];
+
         // short-circuits
         for (const option of options) {
             if (option.isSome()) {

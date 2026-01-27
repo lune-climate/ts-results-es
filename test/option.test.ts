@@ -106,22 +106,102 @@ test('mapOr / mapOrElse', () => {
     ).toEqual(22);
 });
 
-test('all / any', () => {
-    const strings = ['foo', 'bar', 'baz'] as const;
-    const options = [Some('foo' as const), Some('bar' as const), Some('baz' as const)] as const;
+test('Option.all', () => {
+    const some0: Option<number> = Some(3);
+    const some1: Option<boolean> = Some(true);
+    const some2: Option<string> = Some('hello');
 
-    const all = Option.all(...options);
-    eq<typeof all, Option<['foo', 'bar', 'baz']>>(true);
+    // Empty cases
+    const all0 = Option.all([]);
+    expect(all0).toEqual(Some([]));
+    eq<typeof all0, Option<[]>>(true);
 
-    expect(Option.all(...options)).toEqual(Some(strings));
-    expect(Option.all()).toEqual(Some([]));
-    expect(Option.all(...options, None)).toEqual(None);
+    const all0Spread = Option.all();
+    expect(all0Spread).toEqual(Some([]));
+    eq<typeof all0Spread, Option<[]>>(true);
 
-    expect(Option.any(...options)).toEqual(Some('foo'));
-    expect(Option.any(...options, None)).toEqual(Some('foo'));
-    expect(Option.any(None, None)).toEqual(None);
-    expect(Option.any(None, Some('foo'))).toEqual(Some('foo'));
-    expect(Option.any()).toEqual(None);
+    // All Some
+    const all1 = Option.all([some0, some1]);
+    expect(all1).toEqual(Some([3, true]));
+    eq<typeof all1, Option<[number, boolean]>>(true);
+
+    const all1Spread = Option.all(some0, some1);
+    expect(all1Spread).toEqual(Some([3, true]));
+    eq<typeof all1Spread, Option<[number, boolean]>>(true);
+
+    // With None
+    const all2 = Option.all([some0, None]);
+    expect(all2).toEqual(None);
+    eq<typeof all2, Option<[number, never]>>(true);
+
+    const all2Spread = Option.all(some0, None);
+    expect(all2Spread).toEqual(None);
+    eq<typeof all2Spread, Option<[number, never]>>(true);
+
+    // Dynamic array
+    const all3 = Option.all([] as Option<string>[]);
+    eq<typeof all3, Option<string[]>>(true);
+
+    const all3Spread = Option.all(...([] as Option<string>[]));
+    eq<typeof all3Spread, Option<string[]>>(true);
+
+    // Multiple with None in middle
+    const all4 = Option.all([some0, some1, some2, None]);
+    expect(all4).toEqual(None);
+    eq<typeof all4, Option<[number, boolean, string, never]>>(true);
+
+    const all4Spread = Option.all(some0, some1, some2, None);
+    expect(all4Spread).toEqual(None);
+    eq<typeof all4Spread, Option<[number, boolean, string, never]>>(true);
+});
+
+test('Option.any', () => {
+    const some0: Option<number> = Some(3);
+    const some1: Option<boolean> = Some(true);
+    const some2: Option<string> = Some('hello');
+
+    // Empty cases
+    const any0 = Option.any([]);
+    expect(any0).toEqual(None);
+    eq<typeof any0, Option<never>>(true);
+
+    const any0Spread = Option.any();
+    expect(any0Spread).toEqual(None);
+    eq<typeof any0Spread, Option<never>>(true);
+
+    // All Some - returns first
+    const any1 = Option.any([some0, some1]);
+    expect(any1).toEqual(Some(3));
+    eq<typeof any1, Option<number | boolean>>(true);
+
+    const any1Spread = Option.any(some0, some1);
+    expect(any1Spread).toEqual(Some(3));
+    eq<typeof any1Spread, Option<number | boolean>>(true);
+
+    // All None
+    const any2 = Option.any([None, None]);
+    expect(any2).toEqual(None);
+    eq<typeof any2, Option<never>>(true);
+
+    const any2Spread = Option.any(None, None);
+    expect(any2Spread).toEqual(None);
+    eq<typeof any2Spread, Option<never>>(true);
+
+    // Dynamic array
+    const any3 = Option.any([] as Option<string>[]);
+    eq<typeof any3, Option<string>>(true);
+
+    const any3Spread = Option.any(...([] as Option<string>[]));
+    eq<typeof any3Spread, Option<string>>(true);
+
+    // None then Some
+    const any4 = Option.any([None, None, some2, some0]);
+    expect(any4).toEqual(Some('hello'));
+    eq<typeof any4, Option<string | number>>(true);
+
+    const any4Spread = Option.any(None, None, some2, some0);
+    expect(any4Spread).toEqual(Some('hello'));
+    eq<typeof any4Spread, Option<string | number>>(true);
 });
 
 test('Type Helpers', () => {

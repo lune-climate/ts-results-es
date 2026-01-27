@@ -1,7 +1,11 @@
+.. _module-rxjs:
+
 rxjs-operators
 ==============
 
 This page documents integration with `Reactive Extensions for JavaScript`_.
+
+.. _function-rxjs-resultMap:
 
 ``resultMap()``
 ---------------
@@ -34,6 +38,8 @@ on a stream of Result objects.
    // Was greater than zero: true
    // Got Error Message: uh oh
 
+.. _function-rxjs-resultMapErr:
+
 ``resultMapErr()``
 ------------------
 
@@ -43,6 +49,8 @@ on a stream of Result objects.
 
 Behaves exactly the same as `resultMap()`_, but maps the
 error value.
+
+.. _function-rxjs-resultMapTo:
 
 ``resultMapTo()``
 -----------------
@@ -54,6 +62,8 @@ error value.
 Behaves the same as `resultMap()`_, but takes a value
 instead of a function.
 
+.. _function-rxjs-resultMapErrTo:
+
 ``resultMapErrTo()``
 --------------------
 
@@ -63,6 +73,8 @@ instead of a function.
 
 Behaves the same as `resultMapErr()`_, but takes a value
 instead of a function.
+
+.. _function-rxjs-elseMap:
 
 ``elseMap()``
 -------------
@@ -98,6 +110,8 @@ of Result objects.
    // Got error: uh oh
    // Got number: -1
 
+.. _function-rxjs-elseMapTo:
+
 ``elseMapTo()``
 ---------------
 
@@ -107,6 +121,9 @@ of Result objects.
 
 Behaves the same as `elseMap()`_, but takes a value instead of
 a function.
+
+.. _function-rxjs-resultSwitchMap:
+.. _function-rxjs-resultMergeMap:
 
 ``resultSwitchMap()`` and ``resultMergeMap()``
 ----------------------------------------------
@@ -157,6 +174,8 @@ stream of ``Result<T2, E2>`` objects turn the stream into a stream of
    // Got error: custom error
    // Got error: uh oh
 
+.. _function-rxjs-filterResultOk:
+
 ``filterResultOk()``
 --------------------
 
@@ -179,6 +198,8 @@ filtering out the Errs and mapping to the Ok values.
 
    // Logs the following:
    // Got number: 5
+
+.. _function-rxjs-filterResultErr:
 
 ``filterResultErr()``
 ---------------------

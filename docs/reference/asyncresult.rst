@@ -1,3 +1,5 @@
+.. _class-AsyncResult:
+
 AsyncResult
 ===========
 
@@ -37,6 +39,8 @@ Or you can use the :ref:`Result.toAsyncResult() <method-Result-toAsyncResult>` m
     const result3 = Ok(1).toAsyncResult()
 
 
+.. _method-AsyncResult-andThen:
+
 ``andThen()``
 -------------
 
@@ -61,6 +65,8 @@ Example:
     await badResult.andThen(async (value) => Ok(value * 2)).promise // Err('boo')
 
 
+.. _method-AsyncResult-map:
+
 ``map()``
 ---------
 
@@ -83,6 +89,8 @@ Example:
     await goodResult.map(async (value) => value * 2).promise // Ok(2)
     await badResult.andThen(async (value) => value * 2).promise // Err('boo')
 
+.. _method-AsyncResult-mapErr:
+
 ``mapErr()``
 ------------
 
@@ -103,6 +111,8 @@ Example:
     await goodResult.mapErr(async (error) => `Error is ${error}`).promise // Ok(1)
     await badResult.mapErr(async (error) => `Error is ${error}`).promise // Err('Error is boo')
 
+
+.. _method-AsyncResult-or:
 
 ``or()``
 --------
@@ -153,6 +163,8 @@ Example:
     await goodResult.orElse(() => Ok(123)).promise // Ok(1)
 
 
+.. _attribute-AsyncResult-promise:
+
 ``promise``
 -----------
 
@@ -165,6 +177,8 @@ A promise that resolves to a synchronous result.
 You can await it to convert ``AsyncResult<T, E>`` to ``Result<T, E>``, but prefer 
 awaiting ``AsyncResult`` directly (see: `then()`_). Only use this property 
 if you need the underlying Promise for specific use cases.
+
+.. _method-AsyncResult-then:
 
 ``then()``
 ----------
@@ -189,6 +203,8 @@ Example:
     const asyncResult = new AsyncResult(Ok(42))
     const result = await asyncResult // Returns Result<number, Error>
 
+
+.. _method-AsyncResult-toOption:
 
 ``toOption()``
 --------------

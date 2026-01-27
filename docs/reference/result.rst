@@ -433,7 +433,7 @@ A stack trace is generated when an ``Err`` is created.
     let error = Err('Uh Oh');
     let stack = error.stack;
 
-.. _toAsyncResult:
+.. _method-Result-toAsyncResult:
 
 ``toAsyncResult()``
 -------------------

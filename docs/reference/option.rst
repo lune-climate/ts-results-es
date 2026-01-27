@@ -240,7 +240,7 @@ Example:
     type Input = [Option<string>, Option<number>, Option<boolean>]
     type Output = OptionSomeTypes<Input> // [string, number, boolean]
 
-.. _toAsyncOption:
+.. _method-Option-toAsyncOption:
 
 ``toAsyncOption()``
 -------------------

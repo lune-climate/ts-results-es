@@ -30,7 +30,7 @@ You can construct it directly from ``Result<T, E>`` or ``Promise<Result<T, E>>``
     const result1 = new AsyncResult(Ok(1))
     const result2 = new AsyncResult((async () => Err('bad_error')())
 
-Or you can use the :ref:`Result.toAsyncResult() <toAsyncResult>` method:
+Or you can use the :ref:`Result.toAsyncResult() <method-Result-toAsyncResult>` method:
 
 .. code-block:: typescript
 
@@ -113,7 +113,7 @@ Example:
 
 Returns the value from ``other`` if this ``AsyncResult`` contains ``Err``, otherwise returns self.
 
-If ``other`` is a result of a function call consider using :ref:`AsyncResult.orElse` instead, it will
+If ``other`` is a result of a function call consider using :ref:`method-AsyncResult-orElse` instead, it will
 only evaluate the function when needed.
 
 Example:
@@ -127,7 +127,7 @@ Example:
     await goodResult.or(Ok(123)).promise // Ok(1)
 
 
-.. _AsyncResult.orElse:
+.. _method-AsyncResult-orElse:
 
 ``orElse()``
 ------------

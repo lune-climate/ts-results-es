@@ -30,7 +30,7 @@ You can construct it directly from ``Option<T>`` or ``Promise<Option<T>>``:
     const option1 = new AsyncOption(Some(1))
     const option2 = new AsyncOption((async () => None)())
 
-Or you can use the :ref:`Option.toAsyncOption() <toAsyncOption>` method:
+Or you can use the :ref:`Option.toAsyncOption() <method-Option-toAsyncOption>` method:
 
 .. code-block:: typescript
 
@@ -92,7 +92,7 @@ Example:
 
 Returns the value from ``other`` if this ``AsyncOption`` contains ``None``, otherwise returns self.
 
-If ``other`` is a result of a function call consider using :ref:`AsyncOption.orElse` instead, it will
+If ``other`` is a result of a function call consider using :ref:`method-AsyncOption-orElse` instead, it will
 only evaluate the function when needed.
 
 Example:
@@ -105,7 +105,7 @@ Example:
     await noValue.or(Some(123)).promise // Some(123)
     await hasValue.or(Some(123)).promise // Some(1)
 
-.. _AsyncOption.orElse:
+.. _method-AsyncOption-orElse:
 
 ``orElse()``
 ------------

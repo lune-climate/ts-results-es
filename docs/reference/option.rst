@@ -1,3 +1,5 @@
+.. _class-Option:
+
 Option
 ======
 
@@ -19,6 +21,8 @@ Construction:
 
     const some = Some('some value')
     // None is a singleton, no construction necessary
+
+.. _method-Option-all:
 
 ``all()``
 ---------
@@ -45,6 +49,8 @@ Example:
     let optionsWithNone: Option<number>[] = [Some(1), None, Some(3)];
     Option.all(optionsWithNone); // None, type: Option<number[]>
 
+.. _method-Option-any:
+
 ``any()``
 ---------
 
@@ -69,6 +75,8 @@ Example:
     Option.any([None, None, Some(3)]); // Some(3), type: Option<number>
     Option.any([None, None, None]); // None, type: Option<never>
 
+.. _attribute-Some-EMPTY:
+
 ``Some.EMPTY``
 --------------
 
@@ -85,6 +93,8 @@ Example:
 
     const x: Option<void> = Some.EMPTY
 
+.. _method-Option-andThen:
+
 ``andThen()``
 -------------
 
@@ -95,10 +105,14 @@ Example:
 Calls ``mapper`` if the ``Option`` is ``Some``, otherwise returns ``None``.
 This function can be used for control flow based on ``Option`` values.
 
+.. _attribute-Some-value:
+
 ``value``
 ---------
 
 The value contained in ``Some``. Only present on ``Some`` objects.
+
+.. _method-Option-expect:
 
 ``expect()``
 ------------
@@ -116,6 +130,8 @@ there won't be an exception thrown on access.
 
 ``msg``: the message to throw if no ``Some`` value.
 
+.. _method-Option-isNone:
+
 ``isNone()``
 ------------
 
@@ -125,6 +141,8 @@ there won't be an exception thrown on access.
 
 ``true`` when the ``Option`` is ``None``.
 
+.. _method-Option-isSome:
+
 ``isSome()``
 ------------
 
@@ -133,6 +151,8 @@ there won't be an exception thrown on access.
     isSome(): this is Some<T>
 
 ``true`` when the ``Option`` is ``Some``.
+
+.. _method-Option-map:
 
 ``map()``
 ---------
@@ -145,6 +165,8 @@ Maps an ``Option<T>`` to ``Option<U>`` by applying a function to a contained ``S
 leaving a ``None`` value untouched.
 
 This function can be used to compose the Options of two functions.
+
+.. _method-Option-mapOr:
 
 ``mapOr()``
 -----------
@@ -159,6 +181,8 @@ of ``Some``) or using the ``default_`` value (in case of ``None``).
 If ``default_`` is a result of a function call consider using `mapOrElse()`_ instead, it will
 only evaluate the function when needed.
 
+.. _method-Option-mapOrElse:
+
 ``mapOrElse()``
 ---------------
 
@@ -168,6 +192,8 @@ only evaluate the function when needed.
 
 Maps an ``Option<T>`` to ``Option<U>`` by either converting ``T`` to ``U`` using ``mapper`` (in case
 of ``Some``) or producing a default value using the ``default_`` function (in case of ``None``).
+
+.. _method-Option-or:
 
 ``or()``
 --------
@@ -188,6 +214,8 @@ Example:
     Some(1).or(Some(2)) // => Some(1)
     None.or(Some(2)) // => Some(2)
 
+.. _method-Option-orElse:
+
 ``orElse()``
 ------------
 
@@ -207,6 +235,8 @@ Example:
     Some(1).orElse(() => Some(2)) // => Some(1)
     None.orElse(() => Some(2)) // => Some(2)
 
+.. _type-OptionSomeType:
+
 ``OptionSomeType``
 ------------------
 
@@ -222,6 +252,8 @@ Example:
 
     type Input = Option<string>
     type Output = OptionSomeType<Input> // string
+
+.. _type-OptionSomeTypes:
 
 ``OptionSomeTypes``
 -------------------
@@ -254,6 +286,8 @@ Creates an `AsyncOption` based on this `Option`.
 Useful when you need to compose results with asynchronous code.
 
 
+.. _method-Option-toResult:
+
 ``toResult()``
 --------------
 
@@ -262,6 +296,8 @@ Useful when you need to compose results with asynchronous code.
     toResult<E>(error: E): Result<T, E>
 
 Maps an ``Option<T>`` to a ``Result<T, E>``.
+
+.. _method-Option-unwrap:
 
 ``unwrap()``
 ------------
@@ -281,6 +317,8 @@ there won't be an exception thrown on access.
 
 Throws if the value is ``None``.
 
+.. _method-Option-unwrapOr:
+
 ``unwrapOr()``
 --------------
 
@@ -289,6 +327,8 @@ Throws if the value is ``None``.
     unwrapOr<T2>(val: T2): T | T2
 
 Returns the contained ``Some`` value or a provided default.
+
+.. _method-Option-unwrapOrElse:
 
 ``unwrapOrElse()``
 ------------------
@@ -310,6 +350,8 @@ Example:
     ) // => 'OK', nothing printed
 
     None.unwrapOrElse(() => 'UGH') // => 'UGH'
+
+.. _method-Option-Iterable:
 
 Iterable
 --------

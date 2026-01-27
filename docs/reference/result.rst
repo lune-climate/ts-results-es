@@ -1,3 +1,5 @@
+.. _class-Result:
+
 Result
 ======
 
@@ -24,6 +26,8 @@ Construction:
 ``Result`` can only be combined with synchronous code. Look at :doc:`asyncresult` if you need
 to combine results with asynchronouse code.
 
+.. _method-Result-all:
+
 ``all()``
 ---------
 
@@ -44,6 +48,8 @@ Example:
     let result = Result.all(results); // Result<Topping[], GetToppingsError>
 
     let toppings = result.unwrap(); // toppings is an array of Topping.  Could throw GetToppingsError.
+
+.. _method-Result-andThen:
 
 ``andThen()``
 -------------
@@ -79,6 +85,8 @@ Example:
         .mapErr((err) => new Error('mapped'))
         .unwrap(); // throws Error('mapped')
 
+.. _method-Result-any:
+
 ``any()``
 ---------
 
@@ -100,6 +108,8 @@ Example:
 
     let url = results.unwrap(); // At least one attempt gave us a successful url
 
+.. _method-Result-partition:
+
 ``partition()``
 ---------------
 
@@ -118,6 +128,8 @@ Example:
 
     let [numbers, errors] = Result.partition(results); // [ [1, 2], ['error1', 'error2'] ]
 
+.. _attribute-Err-EMPTY:
+
 ``Err.EMPTY``
 -------------
 
@@ -133,6 +145,8 @@ Example:
 .. code-block:: typescript
 
     const x: Result<string, void> = Err.EMPTY
+
+.. _attribute-Ok-EMPTY:
 
 ``Ok.EMPTY``
 ------------
@@ -150,6 +164,8 @@ Example:
 
     const x: Result<void, string> = Ok.EMPTY
 
+.. _type-ResultErrType:
+
 ``ResultErrType``
 -----------------
 
@@ -165,6 +181,8 @@ Example:
 
     type Input = Result<string, Error>
     type Output = ResultErrType<Input> // Error
+
+.. _type-ResultErrTypes:
 
 ``ResultErrTypes``
 ------------------
@@ -183,6 +201,8 @@ Example:
     type Input = [Result<string, Error>, Result<number, Error>]
     type Output = ResultErrTypes<Input> // [Error, Error]
 
+.. _type-ResultOkType:
+
 ``ResultOkType``
 ----------------
 
@@ -198,6 +218,8 @@ Example:
 
     type Input = Result<string, Error>
     type Output = ResultOkType<Input> // string
+
+.. _type-ResultOkTypes:
 
 ``ResultOkTypes``
 -----------------
@@ -216,15 +238,21 @@ Example:
     type Input = [Result<string, Error>, Result<number, Error>]
     type Output = ResultOkTypes<Input> // [string, number]
 
+.. _attribute-Err-error:
+
 ``error``
 ---------
 
 The error contained in ``Err``. Only present on ``Err`` objects.
 
+.. _attribute-Ok-value:
+
 ``value``
 ---------
 
 The value contained in ``Ok``. Only present on ``Ok`` objects.
+
+.. _method-Result-expect:
 
 ``expect()``
 ------------
@@ -254,6 +282,8 @@ Example:
     goodResult.expect('goodResult should be a number'); // 1
     badResult.expect('badResult should be a number'); // throws Error("badResult should be a number - Error: something went wrong")
 
+.. _method-Result-expectErr:
+
 ``expectErr()``
 ---------------
 
@@ -275,6 +305,8 @@ Example:
     goodResult.expectErr('goodResult should not be a number'); // throws Error("goodResult should not be a number")
     badResult.expectErr('badResult should not be a number'); // new Error('something went wrong')
 
+.. _method-Result-isOk:
+
 ``isOk()``
 ----------
 
@@ -284,6 +316,8 @@ Example:
 
 ``true`` when the result is ``Ok``.
 
+.. _method-Result-isErr:
+
 ``isErr()``
 -----------
 
@@ -292,6 +326,8 @@ Example:
     isErr(): this is Err<E>
 
 ``true`` when the result is ``Err``.
+
+.. _method-Result-map:
 
 ``map()``
 ---------
@@ -314,6 +350,8 @@ Example:
 
     goodResult.map((num) => num + 1).unwrap(); // 2
     badResult.map((num) => num + 1).unwrap(); // throws Error("something went wrong")
+
+.. _method-Result-mapErr:
 
 ``mapErr()``
 ------------
@@ -343,6 +381,8 @@ Example:
         .mapErr((err) => new Error('mapped'))
         .unwrap(); // throws Error("mapped")
 
+.. _method-Result-mapOr:
+
 ``mapOr()``
 -----------
 
@@ -366,6 +406,8 @@ Example:
     goodResult.mapOr(0, (value) => -value) // -1
     badResult.mapOr(0, (value) => -value) // 0
 
+.. _method-Result-mapOrElse:
+
 ``mapOrElse()``
 ---------------
 
@@ -384,6 +426,8 @@ Maps a ``Result<T, E>`` to ``Result<U, E>`` by either converting ``T`` to ``U`` 
 
     goodResult.mapOrElse((_error) => 0, (value) => -value) // -1
     badResult.mapOrElse((_error) => 0, (value) => -value) // 0
+
+.. _method-Result-or:
 
 ``or()``
 --------
@@ -404,6 +448,8 @@ Example:
     Ok(1).or(Ok(2)) // => Ok(1)
     Err('error here').or(Ok(2)) // => Ok(2)
 
+.. _method-Result-orElse:
+
 ``orElse()``
 ------------
 
@@ -422,6 +468,8 @@ Example:
 
     Ok(1).orElse(() => Ok(2)) // => Ok(1)
     Err('error').orElse(() => Ok(2)) // => Ok(2) 
+
+.. _attribute-Err-stack:
 
 ``stack``
 ---------
@@ -447,6 +495,8 @@ Creates an `AsyncResult` based on this `Result`.
 Useful when you need to compose results with asynchronous code.
 
 
+.. _method-Result-toOption:
+
 ``toOption()``
 --------------
 
@@ -455,6 +505,8 @@ Useful when you need to compose results with asynchronous code.
     toOption(): Option<T>
 
 Converts from ``Result<T, E>`` to ``Option<T>``  , discarding the error if any.
+
+.. _method-Result-unwrap:
 
 ``unwrap()``
 ------------
@@ -485,6 +537,8 @@ Example:
     goodResult.unwrap(); // 1
     badResult.unwrap(); // throws Error("something went wrong")
 
+.. _method-Result-unwrapErr:
+
 ``unwrapErr()``
 ---------------
 
@@ -510,6 +564,8 @@ Example:
     goodResult.unwrapErr(); // throws an exception
     badResult.unwrapErr(); // returns 'something went wrong'
 
+.. _method-Result-unwrapOr:
+
 ``unwrapOr()``
 --------------
 
@@ -528,6 +584,8 @@ Example:
 
     goodResult.unwrapOr(5); // 1
     badResult.unwrapOr(5); // 5
+
+.. _method-Result-unwrapOrElse:
 
 ``unwrapOrElse()``
 ------------------
@@ -550,6 +608,8 @@ Example:
 
     Err('A03B').unwrapOrElse((error) => `UGH, got ${error}`) // => 'UGH, got A03B'
 
+.. _method-Result-wrap:
+
 ``wrap()``
 ----------
 
@@ -569,6 +629,8 @@ Example:
 
     Result.wrap(() => JSON.parse('not json')) // Err(SyntaxError: ...), type: Result<any, unknown>
 
+.. _method-Result-wrapAsync:
+
 ``wrapAsync()``
 ---------------
 
@@ -585,6 +647,8 @@ Example:
 .. code-block:: typescript
 
     await Result.wrapAsync(() => fetch('/api/data').then(r => r.json())) // Ok(data) or Err(error), type: Result<any, unknown>
+
+.. _method-Result-Iterable:
 
 Iterable
 --------

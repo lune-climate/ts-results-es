@@ -30,12 +30,30 @@ interface BaseResult<T, E> extends Iterable<T> {
      * there won't be an exception thrown on access.
      *
      * @param msg the message to throw if no Ok value.
+     *
+     * @example
+     * ```typescript
+     * let goodResult = Ok(1);
+     * let badResult = Err(new Error('something went wrong'));
+     *
+     * goodResult.expect('goodResult should be a number'); // 1
+     * badResult.expect('badResult should be a number'); // throws Error("badResult should be a number - Error: something went wrong")
+     * ```
      */
     expect(msg: string): T;
 
     /**
      * Returns the contained `Err` value, if exists.  Throws an error if not.
      * @param msg the message to throw if no Err value.
+     *
+     * @example
+     * ```typescript
+     * let goodResult = Ok(1);
+     * let badResult = Err(new Error('something went wrong'));
+     *
+     * goodResult.expectErr('goodResult should not be a number'); // throws Error("goodResult should not be a number")
+     * badResult.expectErr('badResult should not be a number'); // new Error('something went wrong')
+     * ```
      */
     expectErr(msg: string): E;
 
@@ -52,6 +70,15 @@ interface BaseResult<T, E> extends Iterable<T> {
      * Throws if the value is an `Err`, with a message provided by the `Err`'s value and
      * [`cause'](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause)
      * set to the value.
+     *
+     * @example
+     * ```typescript
+     * let goodResult = new Ok(1);
+     * let badResult = new Err(new Error('something went wrong'));
+     *
+     * goodResult.unwrap(); // 1
+     * badResult.unwrap(); // throws Error("something went wrong")
+     * ```
      */
     unwrap(): T;
 
@@ -64,6 +91,15 @@ interface BaseResult<T, E> extends Iterable<T> {
      * Throws if the value is an `Ok`, with a message provided by the `Ok`'s value and
      * [`cause'](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause)
      * set to the value.
+     *
+     * @example
+     * ```typescript
+     * let goodResult = new Ok(1);
+     * let badResult = new Err('something went wrong');
+     *
+     * goodResult.unwrapErr(); // throws an exception
+     * badResult.unwrapErr(); // returns 'something went wrong'
+     * ```
      */
     unwrapErr(): E;
 
@@ -71,6 +107,15 @@ interface BaseResult<T, E> extends Iterable<T> {
      * Returns the contained `Ok` value or a provided default.
      *
      *  (This is the `unwrap_or` in rust)
+     *
+     * @example
+     * ```typescript
+     * let goodResult = Ok(1);
+     * let badResult = Err(new Error('something went wrong'));
+     *
+     * goodResult.unwrapOr(5); // 1
+     * badResult.unwrapOr(5); // 5
+     * ```
      */
     unwrapOr<T2>(val: T2): T | T2;
 
@@ -93,6 +138,29 @@ interface BaseResult<T, E> extends Iterable<T> {
     /**
      * Calls `mapper` if the result is `Ok`, otherwise returns the `Err` value of self.
      * This function can be used for control flow based on `Result` values.
+     *
+     * @example
+     * ```typescript
+     * let goodResult = Ok(1);
+     * let badResult = Err(new Error('something went wrong'));
+     *
+     * goodResult.andThen((num) => new Ok(num + 1)).unwrap(); // 2
+     * badResult.andThen((num) => new Err(new Error('2nd error'))).unwrap(); // throws Error('something went wrong')
+     * goodResult.andThen((num) => new Err(new Error('2nd error'))).unwrap(); // throws Error('2nd error')
+     *
+     * goodResult
+     *     .andThen((num) => new Ok(num + 1))
+     *     .mapErr((err) => new Error('mapped'))
+     *     .unwrap(); // 2
+     * badResult
+     *     .andThen((num) => new Err(new Error('2nd error')))
+     *     .mapErr((err) => new Error('mapped'))
+     *     .unwrap(); // throws Error('mapped')
+     * goodResult
+     *     .andThen((num) => new Err(new Error('2nd error')))
+     *     .mapErr((err) => new Error('mapped'))
+     *     .unwrap(); // throws Error('mapped')
+     * ```
      */
     andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E | E2>;
 
@@ -101,6 +169,15 @@ interface BaseResult<T, E> extends Iterable<T> {
      * leaving an `Err` value untouched.
      *
      * This function can be used to compose the results of two functions.
+     *
+     * @example
+     * ```typescript
+     * let goodResult = Ok(1);
+     * let badResult = Err(new Error('something went wrong'));
+     *
+     * goodResult.map((num) => num + 1).unwrap(); // 2
+     * badResult.map((num) => num + 1).unwrap(); // throws Error("something went wrong")
+     * ```
      */
     map<U>(mapper: (val: T) => U): Result<U, E>;
 
@@ -109,6 +186,21 @@ interface BaseResult<T, E> extends Iterable<T> {
      * leaving an `Ok` value untouched.
      *
      * This function can be used to pass through a successful result while handling an error.
+     *
+     * @example
+     * ```typescript
+     * let goodResult = Ok(1);
+     * let badResult = Err(new Error('something went wrong'));
+     *
+     * goodResult
+     *     .map((num) => num + 1)
+     *     .mapErr((err) => new Error('mapped'))
+     *     .unwrap(); // 2
+     * badResult
+     *     .map((num) => num + 1)
+     *     .mapErr((err) => new Error('mapped'))
+     *     .unwrap(); // throws Error("mapped")
+     * ```
      */
     mapErr<F>(mapper: (val: E) => F): Result<T, F>;
 
@@ -118,6 +210,15 @@ interface BaseResult<T, E> extends Iterable<T> {
      *
      * If `default` is a result of a function call consider using `mapOrElse` instead, it will
      * only evaluate the function when needed.
+     *
+     * @example
+     * ```typescript
+     * let goodResult = Ok(1);
+     * let badResult = Err(new Error('something went wrong'));
+     *
+     * goodResult.mapOr(0, (value) => -value) // -1
+     * badResult.mapOr(0, (value) => -value) // 0
+     * ```
      */
     mapOr<U>(default_: U, mapper: (val: T) => U): U;
 
@@ -125,6 +226,15 @@ interface BaseResult<T, E> extends Iterable<T> {
      * Maps a `Result<T, E>` to `Result<U, E>` by either converting `T` to `U` using `mapper`
      * (in case of `Ok`) or producing a default value using the `default` function (in case of
      * `Err`).
+     *
+     * @example
+     * ```typescript
+     * let goodResult = Ok(1);
+     * let badResult = Err(new Error('something went wrong'));
+     *
+     * goodResult.mapOrElse((_error) => 0, (value) => -value) // -1
+     * badResult.mapOrElse((_error) => 0, (value) => -value) // 0
+     * ```
      */
     mapOrElse<U>(default_: (error: E) => U, mapper: (val: T) => U): U;
 
@@ -173,7 +283,14 @@ interface BaseResult<T, E> extends Iterable<T> {
  * Contains the error value
  */
 export class ErrImpl<E> implements BaseResult<never, E> {
-    /** An empty Err */
+    /**
+     * An empty Err
+     *
+     * @example
+     * ```typescript
+     * const x: Result<string, void> = Err.EMPTY
+     * ```
+     */
     static readonly EMPTY = new ErrImpl<void>(undefined);
 
     isOk(): this is OkImpl<never> {
@@ -296,6 +413,14 @@ export type Err<E> = ErrImpl<E>;
  * Contains the success value
  */
 export class OkImpl<T> implements BaseResult<T, never> {
+    /**
+     * An empty Ok
+     *
+     * @example
+     * ```typescript
+     * const x: Result<void, string> = Ok.EMPTY
+     * ```
+     */
     static readonly EMPTY = new OkImpl<void>(undefined);
 
     isOk(): this is OkImpl<T> {
@@ -408,6 +533,15 @@ export namespace Result {
     /**
      * Parse a set of `Result`s, returning an array of all `Ok` values.
      * Short circuits with the first `Err` found, if any
+     *
+     * @example
+     * ```typescript
+     * let results: Result<Topping, GetToppingsError>[] = pizzaToppingNames.map(name => getPizzaToppingByName(name));
+     *
+     * let result = Result.all(results); // Result<Topping[], GetToppingsError>
+     *
+     * let toppings = result.unwrap(); // toppings is an array of Topping.  Could throw GetToppingsError.
+     * ```
      */
     export function all<const T extends Result<any, any>[]>(
         results: T,
@@ -427,6 +561,15 @@ export namespace Result {
     /**
      * Parse a set of `Result`s, short-circuits when an input value is `Ok`.
      * If no `Ok` is found, returns an `Err` containing the collected error values
+     *
+     * @example
+     * ```typescript
+     * let connections: Array<Result<string, Error>> = [attempt1(), attempt2(), attempt3()];
+     *
+     * let results = Result.any(connections); // Result<string, Error[]>
+     *
+     * let url = results.unwrap(); // At least one attempt gave us a successful url
+     * ```
      */
     export function any<const T extends Result<any, any>[]>(
         results: T,
@@ -449,6 +592,13 @@ export namespace Result {
     /**
      * Wrap an operation that may throw an Error (`try-catch` style) into checked exception style
      * @param op The operation function
+     *
+     * @example
+     * ```typescript
+     * Result.wrap(() => JSON.parse('{"valid": "json"}')) // Ok({ valid: 'json' }), type: Result<any, unknown>
+     *
+     * Result.wrap(() => JSON.parse('not json')) // Err(SyntaxError: ...), type: Result<any, unknown>
+     * ```
      */
     export function wrap<T, E = unknown>(op: () => T): Result<T, E> {
         try {
@@ -461,6 +611,11 @@ export namespace Result {
     /**
      * Wrap an async operation that may throw an Error (`try-catch` style) into checked exception style
      * @param op The operation function
+     *
+     * @example
+     * ```typescript
+     * await Result.wrapAsync(() => fetch('/api/data').then(r => r.json())) // Ok(data) or Err(error), type: Result<any, unknown>
+     * ```
      */
     export function wrapAsync<T, E = unknown>(op: () => Promise<T>): Promise<Result<T, E>> {
         try {
@@ -474,6 +629,13 @@ export namespace Result {
 
     /**
      * Partitions a set of results, separating the `Ok` and `Err` values.
+     *
+     * @example
+     * ```typescript
+     * let results: Result<number, string>[] = [Ok(1), Err('error1'), Ok(2), Err('error2')];
+     *
+     * let [numbers, errors] = Result.partition(results); // [ [1, 2], ['error1', 'error2'] ]
+     * ```
      */
     export function partition<T extends Result<any, any>[]>(results: T): [ResultOkTypes<T>, ResultErrTypes<T>] {
         return results.reduce(

@@ -8,6 +8,9 @@ Backwards incompatible:
 
 Added:
 
+- Added `Option.fromNullable`, `Option.fromOptional`, and `Option.fromNullish`
+  static methods for converting nullable, optional, and nullish values to
+  `Option`.
 - Added array parameter overloads for `Option.all` and `Option.any`,
   allowing `Option.all([a, b, c])` instead of `Option.all(a, b, c)`.
 

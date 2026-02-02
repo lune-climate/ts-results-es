@@ -75,6 +75,86 @@ Example:
     Option.any([None, None, Some(3)]); // Some(3), type: Option<number>
     Option.any([None, None, None]); // None, type: Option<never>
 
+.. _method-Option-fromNullable:
+
+``fromNullable()``
+------------------
+
+.. code-block:: typescript
+
+    static fromNullable<T>(value: T): Option<Exclude<T, null>>
+
+Converts a nullable value to an :ref:`Option <class-Option>`.
+Returns ``None`` if the value is ``null``, otherwise returns ``Some`` containing the value.
+
+See also :ref:`fromOptional() <method-Option-fromOptional>` for ``T | undefined`` and :ref:`fromNullish() <method-Option-fromNullish>` for ``T | null | undefined``.
+
+See also the explanation :ref:`explanation-nullable-optional-nullish`.
+
+Example:
+
+.. code-block:: typescript
+
+    const value: string | null = 'hello';
+    Option.fromNullable(value); // Some('hello'), type: Option<string>
+
+    const missing: string | null = null;
+    Option.fromNullable(missing); // None, type: Option<string>
+
+.. _method-Option-fromOptional:
+
+``fromOptional()``
+------------------
+
+.. code-block:: typescript
+
+    static fromOptional<T>(value: T): Option<Exclude<T, undefined>>
+
+Converts an optional value to an :ref:`Option <class-Option>`.
+Returns ``None`` if the value is ``undefined``, otherwise returns ``Some`` containing the value.
+
+See also :ref:`fromNullable() <method-Option-fromNullable>` for ``T | null`` and :ref:`fromNullish() <method-Option-fromNullish>` for ``T | null | undefined``.
+
+See also the explanation :ref:`explanation-nullable-optional-nullish`.
+
+Example:
+
+.. code-block:: typescript
+
+    const value: string | undefined = 'hello';
+    Option.fromOptional(value); // Some('hello'), type: Option<string>
+
+    const missing: string | undefined = undefined;
+    Option.fromOptional(missing); // None, type: Option<string>
+
+.. _method-Option-fromNullish:
+
+``fromNullish()``
+-----------------
+
+.. code-block:: typescript
+
+    static fromNullish<T>(value: T): Option<NonNullable<T>>
+
+Converts a nullish value to an :ref:`Option <class-Option>`.
+Returns ``None`` if the value is ``null`` or ``undefined``, otherwise returns ``Some`` containing the value.
+
+Prefer :ref:`fromNullable() <method-Option-fromNullable>` for ``T | null`` or :ref:`fromOptional() <method-Option-fromOptional>` for ``T | undefined``.
+Use this method only when the value is already both nullable and optional and you genuinely want
+``null`` and ``undefined`` to be treated the same.
+
+See also the explanation :ref:`explanation-nullable-optional-nullish`.
+
+Example:
+
+.. code-block:: typescript
+
+    const value: string | null | undefined = 'hello';
+    Option.fromNullish(value); // Some('hello'), type: Option<string>
+
+    const missing: string | null | undefined = null;
+    Option.fromNullish(missing); // None, type: Option<string>
+
 .. _attribute-Some-EMPTY:
 
 ``Some.EMPTY``

@@ -254,3 +254,69 @@ test('iteration', () => {
     expect(Array.from(Some(1))).toEqual([1]);
     expect(Array.from(None)).toEqual([]);
 });
+
+test('fromNullable', () => {
+    const value = 'hello' as string | null;
+    const result = Option.fromNullable(value);
+    expect(result).toEqual(Some('hello'));
+    eq<Option<string>, typeof result>(true);
+
+    const missing = null as string | null;
+    const resultMissing = Option.fromNullable(missing);
+    expect(resultMissing).toEqual(None);
+    eq<Option<string>, typeof resultMissing>(true);
+
+    // Falsy but non-null values → Some
+    const zero = Option.fromNullable(0 as number | null);
+    expect(zero).toEqual(Some(0));
+    eq<Option<number>, typeof zero>(true);
+
+    // undefined is NOT null → Some(undefined)
+    const undef = Option.fromNullable(undefined as undefined | null);
+    expect(undef).toEqual(Some(undefined));
+    eq<Option<undefined>, typeof undef>(true);
+});
+
+test('fromOptional', () => {
+    const value = 'hello' as string | undefined;
+    const result = Option.fromOptional(value);
+    expect(result).toEqual(Some('hello'));
+    eq<Option<string>, typeof result>(true);
+
+    const missing = undefined as string | undefined;
+    const resultMissing = Option.fromOptional(missing);
+    expect(resultMissing).toEqual(None);
+    eq<Option<string>, typeof resultMissing>(true);
+
+    // Falsy but non-undefined values → Some
+    const zero = Option.fromOptional(0 as number | undefined);
+    expect(zero).toEqual(Some(0));
+    eq<Option<number>, typeof zero>(true);
+
+    // null is NOT undefined → Some(null)
+    const nul = Option.fromOptional(null as null | undefined);
+    expect(nul).toEqual(Some(null));
+    eq<Option<null>, typeof nul>(true);
+});
+
+test('fromNullish', () => {
+    const value = 'hello' as string | null | undefined;
+    const result = Option.fromNullish(value);
+    expect(result).toEqual(Some('hello'));
+    eq<Option<string>, typeof result>(true);
+
+    const missingNull = null as string | null | undefined;
+    const resultNull = Option.fromNullish(missingNull);
+    expect(resultNull).toEqual(None);
+    eq<Option<string>, typeof resultNull>(true);
+
+    const missingUndefined = undefined as string | null | undefined;
+    const resultUndefined = Option.fromNullish(missingUndefined);
+    expect(resultUndefined).toEqual(None);
+    eq<Option<string>, typeof resultUndefined>(true);
+
+    // Falsy but non-nullish values → Some
+    const zero = Option.fromNullish(0 as number | null | undefined);
+    expect(zero).toEqual(Some(0));
+    eq<Option<number>, typeof zero>(true);
+});

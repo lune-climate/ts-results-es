@@ -391,4 +391,63 @@ export namespace Option {
     export function isOption<T = any>(value: unknown): value is Option<T> {
         return value instanceof Some || value === None;
     }
+
+    /**
+     * Converts a nullable value to an {@link Option}.
+     * Returns {@link None} if the value is `null`, otherwise returns {@link Some} containing the value.
+     *
+     * See also {@link fromOptional} for `T | undefined` and {@link fromNullish} for `T | null | undefined`.
+     *
+     * @example
+     * ```typescript
+     * const value: string | null = 'hello';
+     * Option.fromNullable(value); // Some('hello'), type: Option<string>
+     *
+     * const missing: string | null = null;
+     * Option.fromNullable(missing); // None, type: Option<string>
+     * ```
+     */
+    export function fromNullable<T>(value: T): Option<Exclude<T, null>> {
+        return (value === null ? None : Some(value)) as Option<Exclude<T, null>>;
+    }
+
+    /**
+     * Converts an optional value to an {@link Option}.
+     * Returns {@link None} if the value is `undefined`, otherwise returns {@link Some} containing the value.
+     *
+     * See also {@link fromNullable} for `T | null` and {@link fromNullish} for `T | null | undefined`.
+     *
+     * @example
+     * ```typescript
+     * const value: string | undefined = 'hello';
+     * Option.fromOptional(value); // Some('hello'), type: Option<string>
+     *
+     * const missing: string | undefined = undefined;
+     * Option.fromOptional(missing); // None, type: Option<string>
+     * ```
+     */
+    export function fromOptional<T>(value: T): Option<Exclude<T, undefined>> {
+        return (value === undefined ? None : Some(value)) as Option<Exclude<T, undefined>>;
+    }
+
+    /**
+     * Converts a nullish value to an {@link Option}.
+     * Returns {@link None} if the value is `null` or `undefined`, otherwise returns {@link Some} containing the value.
+     *
+     * Prefer {@link fromNullable} for `T | null` or {@link fromOptional} for `T | undefined`.
+     * Use this method only when the value is already both nullable and optional and you genuinely
+     * want `null` and `undefined` to be treated the same.
+     *
+     * @example
+     * ```typescript
+     * const value: string | null | undefined = 'hello';
+     * Option.fromNullish(value); // Some('hello'), type: Option<string>
+     *
+     * const missing: string | null | undefined = null;
+     * Option.fromNullish(missing); // None, type: Option<string>
+     * ```
+     */
+    export function fromNullish<T>(value: T): Option<NonNullable<T>> {
+        return value === null || value === undefined ? None : Some(value);
+    }
 }

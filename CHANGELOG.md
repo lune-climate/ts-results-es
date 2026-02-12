@@ -1,3 +1,11 @@
+# Not yet released
+
+Added:
+
+- Added object overload for `Result.all`, accepting any object type with
+  `Result` values (preserving per-key types). Unlike the array variant, it
+  does not short-circuit and collects all errors.
+
 # 7.0.0
 
 Release date: 2026-02-16.

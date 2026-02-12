@@ -529,6 +529,33 @@ export type ResultErrTypes<T extends Result<any, any>[]> = {
     [key in keyof T]: T[key] extends Result<infer U, any> ? ResultErrType<T[key]> : never;
 };
 
+/**
+ * A utility type that extracts the `Ok` value types from an object of `Result`s,
+ * producing an object of the inner types.
+ *
+ * @example
+ * ```typescript
+ * type Input = { name: Result<string, Error>; age: Result<number, Error> }
+ * type Output = ResultOkTypesRecord<Input> // { name: string; age: number }
+ * ```
+ */
+export type ResultOkTypesRecord<T extends Record<string, Result<any, any>>> = {
+    [key in keyof T]: ResultOkType<T[key]>;
+};
+/**
+ * A utility type that extracts the `Err` value types from an object of `Result`s,
+ * producing an object of the error types.
+ *
+ * @example
+ * ```typescript
+ * type Input = { name: Result<string, Error>; age: Result<number, TypeError> }
+ * type Output = ResultErrTypesRecord<Input> // { name: Error; age: TypeError }
+ * ```
+ */
+export type ResultErrTypesRecord<T extends Record<string, Result<any, any>>> = {
+    [key in keyof T]: ResultErrType<T[key]>;
+};
+
 export namespace Result {
     /**
      * Parse a set of `Result`s, returning an array of all `Ok` values.
@@ -545,17 +572,49 @@ export namespace Result {
      */
     export function all<const T extends Result<any, any>[]>(
         results: T,
-    ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]> {
-        const okResult = [];
-        for (let result of results) {
-            if (result.isOk()) {
-                okResult.push(result.value);
-            } else {
-                return result as Err<ResultErrTypes<T>[number]>;
+    ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]>;
+    /**
+     * Parse an object of `Result`s, returning an object of all `Ok` values.
+     * If any `Result` is `Err`, returns an `Err` containing an object of all errors
+     * (only keys that were `Err` are present). Unlike the array variant, it does not
+     * short-circuit and collects all errors.
+     *
+     * @example
+     * ```typescript
+     * let result = Result.all({
+     *     name: Ok('Alice'),
+     *     age: Ok(30),
+     * }); // Result<{ name: string; age: number }, Partial<{ name: never; age: never }>>
+     * ```
+     */
+    export function all<const T extends Record<string, Result<any, any>>>(
+        results: T,
+    ): Result<ResultOkTypesRecord<T>, Partial<ResultErrTypesRecord<T>>>;
+    export function all(results: Result<any, any>[] | Record<string, Result<any, any>>): Result<any, any> {
+        if (Array.isArray(results)) {
+            const okResult = [];
+            for (const result of results) {
+                if (result.isOk()) {
+                    okResult.push(result.value);
+                } else {
+                    return result as Err<any>;
+                }
             }
+            return new Ok(okResult);
+        } else {
+            const okResult: Record<string, any> = {};
+            const errResult: Record<string, any> = {};
+            let hasErr = false;
+            for (const [key, result] of Object.entries(results)) {
+                if (result.isOk()) {
+                    okResult[key] = result.value;
+                } else {
+                    errResult[key] = result.error;
+                    hasErr = true;
+                }
+            }
+            return hasErr ? new Err(errResult) : new Ok(okResult);
         }
-
-        return new Ok(okResult as ResultOkTypes<T>);
     }
 
     /**

@@ -33,13 +33,23 @@ to combine results with asynchronouse code.
 
 .. code-block:: typescript
 
-    // The actual signature is more complicated but this should be good enough.
+    // Array overload
     static all(results: Result<T, E>[]): Result<T[], E>
+
+    // Object overload (accepts any object type with Result values, preserving per-key types)
+    static all<T extends Record<string, Result<any, any>>>(results: T): Result<ResultOkTypesRecord<T>, Partial<ResultErrTypesRecord<T>>>
 
 Parse a set of ``Result``, returning an array of all ``Ok`` values.
 Short circuits with the first ``Err`` found, if any.
 
-Example:
+When called with an object:
+
+Parse an object of ``Result``\s, returning an object of all ``Ok`` values.
+If any ``Result`` is ``Err``, returns an ``Err`` containing an object of all errors
+(only keys that were ``Err`` are present). Unlike the array variant, it does not
+short-circuit and collects all errors.
+
+Array example:
 
 .. code-block:: typescript
 
@@ -48,6 +58,15 @@ Example:
     let result = Result.all(results); // Result<Topping[], GetToppingsError>
 
     let toppings = result.unwrap(); // toppings is an array of Topping.  Could throw GetToppingsError.
+
+Object example:
+
+.. code-block:: typescript
+
+    let result = Result.all({
+        name: Ok('Alice'),
+        age: Ok(30),
+    }); // Result<{ name: string; age: number }, Partial<{ name: never; age: never }>>
 
 .. _method-Result-andThen:
 
@@ -237,6 +256,44 @@ Example:
 
     type Input = [Result<string, Error>, Result<number, Error>]
     type Output = ResultOkTypes<Input> // [string, number]
+
+.. _type-ResultOkTypesRecord:
+
+``ResultOkTypesRecord``
+-----------------------
+
+.. code-block:: typescript
+
+    type ResultOkTypesRecord<T extends Record<string, Result<any, any>>>
+
+A utility type that extracts the ``Ok`` value types from an object of ``Result``\s,
+producing an object of the inner types.
+
+Example:
+
+.. code-block:: typescript
+
+    type Input = { name: Result<string, Error>; age: Result<number, Error> }
+    type Output = ResultOkTypesRecord<Input> // { name: string; age: number }
+
+.. _type-ResultErrTypesRecord:
+
+``ResultErrTypesRecord``
+------------------------
+
+.. code-block:: typescript
+
+    type ResultErrTypesRecord<T extends Record<string, Result<any, any>>>
+
+A utility type that extracts the ``Err`` value types from an object of ``Result``\s,
+producing an object of the error types.
+
+Example:
+
+.. code-block:: typescript
+
+    type Input = { name: Result<string, Error>; age: Result<number, TypeError> }
+    type Output = ResultErrTypesRecord<Input> // { name: Error; age: TypeError }
 
 .. _attribute-Err-error:
 

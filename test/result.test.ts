@@ -302,6 +302,103 @@ test('unwrapOrElse', () => {
     expect(Err('bad error').unwrapOrElse((error) => ({ error }))).toEqual({ error: 'bad error' });
 });
 
+test('tap runs the side effect and returns the original Ok value', () => {
+    const sideEffects: number[] = [];
+    const result = Ok(1).tap((val) => {
+        sideEffects.push(val);
+        return Ok(val * 2);
+    });
+    expect(result).toMatchResult(Ok(1));
+    expect(sideEffects).toEqual([1]);
+});
+
+test('tap propagates Err from the side effect', () => {
+    const result = Ok(1).tap(() => Err('side effect failed'));
+    expect(result).toMatchResult(Err('side effect failed'));
+});
+
+test('tap skips the side effect on Err and returns original Err', () => {
+    const sideEffects: number[] = [];
+    const result = Err('original error').tap(() => {
+        sideEffects.push(1);
+        return Ok(undefined);
+    });
+    expect(result).toMatchResult(Err('original error'));
+    expect(sideEffects).toEqual([]);
+});
+
+test('tap returns the same Ok instance on success (reference identity)', () => {
+    const original = Ok(1) as Result<number, string>;
+    const tapped = original.tap(() => Ok('ignored'));
+    expect(tapped).toBe(original);
+});
+
+test('tap returns the same Err instance when called on Err (reference identity)', () => {
+    const original = Err('fail') as Result<number, string>;
+    const tapped = original.tap(() => Ok(undefined));
+    expect(tapped).toBe(original);
+});
+
+test('tap chains correctly with map after successful tap', () => {
+    const log: string[] = [];
+    const result = (Ok('hello') as Result<string, number>)
+        .tap((val) => {
+            log.push(val);
+            return Ok(undefined);
+        })
+        .map((val) => val.length);
+    expect(result).toMatchResult(Ok(5));
+    expect(log).toEqual(['hello']);
+});
+
+test('tap error short-circuits subsequent map', () => {
+    const result = (Ok('hello') as Result<string, number>)
+        .tap(() => Err('tap failed'))
+        .map((val) => val.length);
+    expect(result).toMatchResult(Err('tap failed'));
+});
+
+test('tap chains correctly with andThen after successful tap', () => {
+    const result = Ok(10)
+        .tap((val) => (val > 0 ? Ok(undefined) : Err('negative' as const)))
+        .andThen((val) => Ok(val * 2));
+    expect(result).toMatchResult(Ok(20));
+});
+
+test('tap error short-circuits subsequent andThen', () => {
+    const result = Ok(-1)
+        .tap((val) => (val > 0 ? Ok(undefined) : Err('negative' as const)))
+        .andThen((val) => Ok(val * 2));
+    expect(result).toMatchResult(Err('negative'));
+});
+
+test('tap multiple taps run all side effects in order', () => {
+    const log: string[] = [];
+    const result = Ok(1)
+        .tap((v) => { log.push(`first: ${v}`); return Ok(undefined); })
+        .tap((v) => { log.push(`second: ${v}`); return Ok(undefined); });
+    expect(result).toMatchResult(Ok(1));
+    expect(log).toEqual(['first: 1', 'second: 1']);
+});
+
+test('tap second tap is skipped when first tap fails', () => {
+    const log: string[] = [];
+    const result = Ok(1 as const)
+        .tap(() => { log.push('first'); return Err('fail' as const); })
+        .tap(() => { log.push('second'); return Ok(undefined); });
+    expect(result).toMatchResult(Err('fail'));
+    expect(log).toEqual(['first']);
+});
+
+test('tap preserves Ok type and accumulates Err type', () => {
+    const typed = Ok(42) as Result<number, string>;
+    const tapped = typed.tap(() => Ok('anything'));
+    eq<typeof tapped, Result<number, string | unknown>>(true);
+
+    const tapped2 = typed.tap(() => Err(123) as Result<boolean, number>);
+    eq<typeof tapped2, Result<number, string | number>>(true);
+});
+
 test('andThen/orElse chaining regression', () => {
     // Based on this issue: https://github.com/lune-climate/ts-results-es/issues/197
     class T1 {

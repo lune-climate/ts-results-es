@@ -1,4 +1,6 @@
-# Not yet released
+# 7.0.0
+
+Release date: 2026-02-16.
 
 Backwards incompatible:
 

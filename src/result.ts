@@ -165,6 +165,29 @@ interface BaseResult<T, E> extends Iterable<T> {
     andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E | E2>;
 
     /**
+     * Calls `mapper` if the result is `Ok`, but returns the original `Ok` value instead of the
+     * mapper's result. If the mapper returns an `Err`, that error is propagated.
+     *
+     * This is similar to `andThen`, but discards the success value of the side effect.
+     * Useful for performing validation, logging, or other side effects without altering the
+     * result chain.
+     *
+     * @example
+     * ```typescript
+     * let goodResult = Ok(1);
+     * let badResult = Err(new Error('something went wrong'));
+     *
+     * goodResult.tap((num) => Ok(console.log(num))).unwrap(); // logs 1, returns 1
+     * badResult.tap((num) => Ok(console.log(num))).unwrapErr(); // nothing logged, returns Error('something went wrong')
+     *
+     * // Side effect errors are propagated
+     * goodResult.tap((num) => num > 0 ? Ok(undefined) : Err('must be positive')).unwrap(); // 1
+     * Ok(-1).tap((num) => num > 0 ? Ok(undefined) : Err('must be positive')).unwrapErr(); // 'must be positive'
+     * ```
+     */
+    tap<E2>(mapper: (val: T) => Result<unknown, E2>): Result<T, E | E2>;
+
+    /**
      * Maps a `Result<T, E>` to `Result<U, E>` by applying a function to a contained `Ok` value,
      * leaving an `Err` value untouched.
      *
@@ -366,6 +389,10 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         return this;
     }
 
+    tap<E2>(op: (val: never) => Result<unknown, E2>): Result<never, E | E2> {
+        return this;
+    }
+
     mapErr<E2>(mapper: (err: E) => E2): Err<E2> {
         return new Err(mapper(this.error));
     }
@@ -478,6 +505,12 @@ export class OkImpl<T> implements BaseResult<T, never> {
 
     andThen<T2, E2>(mapper: (val: T) => Result<T2, E2>): Result<T2, E2> {
         return mapper(this.value);
+    }
+
+    tap<E>(mapper: (val: T) => Result<unknown, E>): Result<T, E> {
+        const result = mapper(this.value);
+        if (result.isErr()) return result;
+        return this;
     }
 
     mapErr(_mapper: unknown): Ok<T> {

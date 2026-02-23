@@ -582,9 +582,9 @@ export namespace Result {
      * @example
      * ```typescript
      * let result = Result.all({
-     *     name: Ok('Alice'),
-     *     age: Ok(30),
-     * }); // Result<{ name: string; age: number }, Partial<{ name: never; age: never }>>
+     *     name: validateName(input.name),  // Result<string, NameError>
+     *     age: validateAge(input.age),     // Result<number, AgeError>
+     * }); // Result<{ name: string; age: number }, Partial<{ name: NameError; age: AgeError }>>
      * ```
      */
     export function all<const T extends Record<string, Result<any, any>>>(

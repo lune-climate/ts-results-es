@@ -137,12 +137,12 @@ test('Result.all', () => {
 });
 
 test('Result.all with object', () => {
-    const ok0 = Ok(3);
-    const ok1 = new Ok(true);
-    const ok2 = new Ok(8 as const) as Result<8, boolean>;
-    const err0 = Err(Symbol());
-    const err1 = new Err(Error());
-    const err2 = new Err(9 as const) as Result<boolean, 9>;
+    const sym = Symbol();
+    const error = Error();
+    const ok0: Result<number, string> = Ok(3);
+    const ok1: Result<boolean, number> = Ok(true);
+    const err0: Result<string, symbol> = Err(sym);
+    const err1: Result<number, Error> = Err(error);
 
     // Empty object
     const all0 = Result.all({});
@@ -152,29 +152,29 @@ test('Result.all with object', () => {
     // All Ok
     const all1 = Result.all({ a: ok0, b: ok1 });
     expect(all1).toMatchResult(Ok({ a: 3, b: true }));
-    eq<typeof all1, Result<{ a: number; b: boolean }, Partial<{ a: never; b: never }>>>(true);
+    eq<typeof all1, Result<{ a: number; b: boolean }, Partial<{ a: string; b: number }>>>(true);
 
     // All Err
     const all2 = Result.all({ a: err0, b: err1 });
     expect(all2).toMatchResult(
         Err({
-            a: err0.error,
-            b: err1.error,
+            a: sym,
+            b: error,
         }),
     );
-    eq<typeof all2, Result<{ a: never; b: never }, Partial<{ a: symbol; b: Error }>>>(true);
+    eq<typeof all2, Result<{ a: string; b: number }, Partial<{ a: symbol; b: Error }>>>(true);
 
     // Mixed
     const all3 = Result.all({ a: ok0, b: err0, c: ok1, d: err1 });
     expect(all3).toMatchResult(
         Err({
-            b: err0.error,
-            d: err1.error,
+            b: sym,
+            d: error,
         }),
     );
     eq<
         typeof all3,
-        Result<{ a: number; b: never; c: boolean; d: never }, Partial<{ a: never; b: symbol; c: never; d: Error }>>
+        Result<{ a: number; b: string; c: boolean; d: number }, Partial<{ a: string; b: symbol; c: number; d: Error }>>
     >(true);
 });
 

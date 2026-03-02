@@ -66,7 +66,9 @@ Object example:
     let result = Result.all({
         name: validateName(input.name),  // Result<string, NameError>
         age: validateAge(input.age),     // Result<number, AgeError>
-    }); // Result<{ name: string; age: number }, Partial<{ name: NameError; age: AgeError }>>
+    });
+    // Ok({ name: 'Alice', age: 25 }),
+    // type: Result<{ name: string; age: number }, Partial<{ name: NameError; age: AgeError }>>
 
 .. _method-Result-andThen:
 

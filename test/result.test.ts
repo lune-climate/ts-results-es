@@ -139,10 +139,10 @@ test('Result.all', () => {
 test('Result.all with object', () => {
     const sym = Symbol();
     const error = Error();
-    const ok0: Result<number, string> = Ok(3);
-    const ok1: Result<boolean, number> = Ok(true);
-    const err0: Result<string, symbol> = Err(sym);
-    const err1: Result<number, Error> = Err(error);
+    const ok0 = Ok(3) as Result<number, string>;
+    const ok1 = Ok(true) as Result<boolean, number>;
+    const err0 = Err(sym) as Result<string, symbol>;
+    const err1 = Err(error) as Result<number, Error>;
 
     // Empty object
     const all0 = Result.all({});

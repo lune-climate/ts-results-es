@@ -6,8 +6,10 @@ import {
     Result,
     ResultErrType,
     ResultErrTypes,
+    ResultErrTypesRecord,
     ResultOkType,
     ResultOkTypes,
+    ResultOkTypesRecord,
     Some,
 } from '../src/index.js';
 import { eq, notSupposedToBeCalled } from './util.js';
@@ -98,6 +100,14 @@ test('ResultOkTypes & ResultErrTypes', () => {
     eq<[never, string, number, symbol, 32], b>(true);
 });
 
+test('ResultOkTypesRecord & ResultErrTypesRecord', () => {
+    type a = ResultOkTypesRecord<{ x: Ok<string>; y: Err<string>; z: Result<symbol, number> }>;
+    eq<{ x: string; y: never; z: symbol }, a>(true);
+
+    type b = ResultErrTypesRecord<{ x: Ok<string>; y: Err<string>; z: Result<symbol, number> }>;
+    eq<{ x: never; y: string; z: number }, b>(true);
+});
+
 test('Result.all', () => {
     const ok0 = Ok(3);
     const ok1 = new Ok(true);
@@ -124,6 +134,48 @@ test('Result.all', () => {
     const all4Array = Result.all([ok0, ok1, ok2, err2]);
     expect(all4Array).toMatchResult(Err(9));
     eq<typeof all4Array, Result<[number, boolean, 8, boolean], boolean | 9>>(true);
+});
+
+test('Result.all with object', () => {
+    const sym = Symbol();
+    const error = Error();
+    const ok0 = Ok(3) as Result<number, string>;
+    const ok1 = Ok(true) as Result<boolean, number>;
+    const err0 = Err(sym) as Result<string, symbol>;
+    const err1 = Err(error) as Result<number, Error>;
+
+    // Empty object
+    const all0 = Result.all({});
+    expect(all0).toMatchResult(Ok({}));
+    eq<typeof all0, Result<{}, Partial<{}>>>(true);
+
+    // All Ok
+    const all1 = Result.all({ a: ok0, b: ok1 });
+    expect(all1).toMatchResult(Ok({ a: 3, b: true }));
+    eq<typeof all1, Result<{ a: number; b: boolean }, Partial<{ a: string; b: number }>>>(true);
+
+    // All Err
+    const all2 = Result.all({ a: err0, b: err1 });
+    expect(all2).toMatchResult(
+        Err({
+            a: sym,
+            b: error,
+        }),
+    );
+    eq<typeof all2, Result<{ a: string; b: number }, Partial<{ a: symbol; b: Error }>>>(true);
+
+    // Mixed
+    const all3 = Result.all({ a: ok0, b: err0, c: ok1, d: err1 });
+    expect(all3).toMatchResult(
+        Err({
+            b: sym,
+            d: error,
+        }),
+    );
+    eq<
+        typeof all3,
+        Result<{ a: number; b: string; c: boolean; d: number }, Partial<{ a: string; b: symbol; c: number; d: Error }>>
+    >(true);
 });
 
 test('Result.any', () => {

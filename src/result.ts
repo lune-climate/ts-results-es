@@ -239,6 +239,25 @@ interface BaseResult<T, E> extends Iterable<T> {
     mapOrElse<U>(default_: (error: E) => U, mapper: (val: T) => U): U;
 
     /**
+     * Matches the Result and executes a handler based on whether it's Ok or Err.
+     * This provides a declarative way to handle both success and error cases.
+     *
+     * @template R The return type of the match handlers.
+     * @param matcher An object with Ok and Err handlers.
+     * @returns The result of executing the appropriate handler.
+     *
+     * @example
+     * ```typescript
+     * const result: Result<number, string> = Ok(42);
+     * const message = result.match({
+     *   Ok: (value) => `Success: ${value}`,
+     *   Err: (error) => `Error: ${error}`,
+     * }); // "Success: 42"
+     * ```
+     */
+    match<R>(matcher: { Ok: (value: T) => R; Err: (error: E) => R }): R;
+
+    /**
      * Returns `Ok()` if we have a value, otherwise returns `other`.
      *
      * `other` is evaluated eagerly. If `other` is a result of a function
@@ -378,6 +397,10 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         return default_(this.error);
     }
 
+    match<R>(matcher: { Ok: (value: never) => R; Err: (error: E) => R }): R {
+        return matcher.Err(this.error);
+    }
+
     or<T>(other: Ok<T>): Result<T, never>;
     or<R extends Result<any, any>>(other: R): R;
     or<T, E2>(other: Result<T, E2>): Result<T, E2> {
@@ -490,6 +513,10 @@ export class OkImpl<T> implements BaseResult<T, never> {
 
     mapOrElse<U>(_default_: (_error: never) => U, mapper: (val: T) => U): U {
         return mapper(this.value);
+    }
+
+    match<R>(matcher: { Ok: (value: T) => R; Err: (error: never) => R }): R {
+        return matcher.Ok(this.value);
     }
 
     or(_other: Result<T, any>): Ok<T> {

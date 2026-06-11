@@ -404,3 +404,47 @@ test('andThen/orElse chaining regression', () => {
     expect(test2).toEqual(Ok({ name: 'T3' }));
     eq<typeof test2, Ok<T3> | Err<E3> | Err<E2 | E3>>(true);
 });
+
+test('match', () => {
+    const ok: Result<number, string> = Ok(10);
+    const err: Result<number, string> = Err('error occurred');
+
+    // Test match on Ok
+    const okResult = ok.match({
+        Ok: (value) => `Success: ${value}`,
+        Err: (error) => `Failure: ${error}`,
+    });
+    expect(okResult).toBe('Success: 10');
+    eq<typeof okResult, string>(true);
+
+    // Test match on Err
+    const errResult = err.match({
+        Ok: (value) => `Success: ${value}`,
+        Err: (error) => `Failure: ${error}`,
+    });
+    expect(errResult).toBe('Failure: error occurred');
+    eq<typeof errResult, string>(true);
+
+    // Test match with different return types (boolean)
+    const boolResult = ok.match({
+        Ok: (value) => value > 5,
+        Err: (_error) => false,
+    });
+    expect(boolResult).toBe(true);
+    eq<typeof boolResult, boolean>(true);
+
+    // Test match with number return types
+    const numResult = ok.match({
+        Ok: (value) => value * 2,
+        Err: (_error) => -1,
+    });
+    expect(numResult).toBe(20);
+    eq<typeof numResult, number>(true);
+
+    const numErrResult = err.match({
+        Ok: (value) => value * 2,
+        Err: (_error) => -1,
+    });
+    expect(numErrResult).toBe(-1);
+    eq<typeof numErrResult, number>(true);
+});

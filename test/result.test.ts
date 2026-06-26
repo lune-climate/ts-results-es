@@ -4,6 +4,7 @@ import {
     Ok,
     Option,
     Result,
+    ResultErrEntry,
     ResultErrType,
     ResultErrTypes,
     ResultErrTypesRecord,
@@ -147,35 +148,148 @@ test('Result.all with object', () => {
     // Empty object
     const all0 = Result.all({});
     expect(all0).toMatchResult(Ok({}));
-    eq<typeof all0, Result<{}, Partial<{}>>>(true);
+    eq<typeof all0, Result<{}, never>>(true);
+
+    const all0AllErrors = Result.all({}, { errors: 'all' });
+    expect(all0AllErrors).toMatchResult(Ok({}));
+    eq<typeof all0AllErrors, Result<{}, Partial<{}>>>(true);
 
     // All Ok
     const all1 = Result.all({ a: ok0, b: ok1 });
     expect(all1).toMatchResult(Ok({ a: 3, b: true }));
-    eq<typeof all1, Result<{ a: number; b: boolean }, Partial<{ a: string; b: number }>>>(true);
+    eq<typeof all1, Result<{ a: number; b: boolean }, { key: 'a'; error: string } | { key: 'b'; error: number }>>(true);
+
+    const all1KnownOk = Result.all({ a: Ok(3), b: Ok(true) });
+    expect(all1KnownOk).toMatchResult(Ok({ a: 3, b: true }));
+    eq<typeof all1KnownOk, Result<{ a: number; b: boolean }, never>>(true);
+
+    const all1AllErrors = Result.all({ a: ok0, b: ok1 }, { errors: 'all' });
+    expect(all1AllErrors).toMatchResult(Ok({ a: 3, b: true }));
+    eq<typeof all1AllErrors, Result<{ a: number; b: boolean }, Partial<{ a: string; b: number }>>>(true);
 
     // All Err
     const all2 = Result.all({ a: err0, b: err1 });
     expect(all2).toMatchResult(
         Err({
+            key: 'a',
+            error: sym,
+        }),
+    );
+    eq<typeof all2, Result<{ a: string; b: number }, { key: 'a'; error: symbol } | { key: 'b'; error: Error }>>(true);
+
+    const all2AllErrors = Result.all({ a: err0, b: err1 }, { errors: 'all' });
+    expect(all2AllErrors).toMatchResult(
+        Err({
             a: sym,
             b: error,
         }),
     );
-    eq<typeof all2, Result<{ a: string; b: number }, Partial<{ a: symbol; b: Error }>>>(true);
+    eq<typeof all2AllErrors, Result<{ a: string; b: number }, Partial<{ a: symbol; b: Error }>>>(true);
 
     // Mixed
     const all3 = Result.all({ a: ok0, b: err0, c: ok1, d: err1 });
     expect(all3).toMatchResult(
+        Err({
+            key: 'b',
+            error: sym,
+        }),
+    );
+    eq<
+        typeof all3,
+        Result<
+            { a: number; b: string; c: boolean; d: number },
+            | { key: 'a'; error: string }
+            | { key: 'b'; error: symbol }
+            | { key: 'c'; error: number }
+            | { key: 'd'; error: Error }
+        >
+    >(true);
+
+    const all3FirstError = Result.all({ a: ok0, b: err0, c: ok1, d: err1 }, { errors: 'first' });
+    expect(all3FirstError).toMatchResult(
+        Err({
+            key: 'b',
+            error: sym,
+        }),
+    );
+    eq<
+        typeof all3FirstError,
+        Result<
+            { a: number; b: string; c: boolean; d: number },
+            | { key: 'a'; error: string }
+            | { key: 'b'; error: symbol }
+            | { key: 'c'; error: number }
+            | { key: 'd'; error: Error }
+        >
+    >(true);
+
+    const all3OmittedErrors = Result.all({ a: ok0, b: err0, c: ok1, d: err1 }, {});
+    expect(all3OmittedErrors).toMatchResult(
+        Err({
+            key: 'b',
+            error: sym,
+        }),
+    );
+    eq<
+        typeof all3OmittedErrors,
+        Result<
+            { a: number; b: string; c: boolean; d: number },
+            | { key: 'a'; error: string }
+            | { key: 'b'; error: symbol }
+            | { key: 'c'; error: number }
+            | { key: 'd'; error: Error }
+        >
+    >(true);
+
+    const all3KnownOk = Result.all({ a: Ok(3), b: err0, c: Ok(true), d: err1 });
+    expect(all3KnownOk).toMatchResult(
+        Err({
+            key: 'b',
+            error: sym,
+        }),
+    );
+    eq<
+        typeof all3KnownOk,
+        Result<
+            { a: number; b: string; c: boolean; d: number },
+            { key: 'b'; error: symbol } | { key: 'd'; error: Error }
+        >
+    >(true);
+    eq<
+        ResultErrEntry<{ a: Ok<number>; b: typeof err0; c: Ok<boolean>; d: typeof err1 }>,
+        { key: 'b'; error: symbol } | { key: 'd'; error: Error }
+    >(true);
+
+    const all3AllErrors = Result.all({ a: ok0, b: err0, c: ok1, d: err1 }, { errors: 'all' });
+    expect(all3AllErrors).toMatchResult(
         Err({
             b: sym,
             d: error,
         }),
     );
     eq<
-        typeof all3,
+        typeof all3AllErrors,
         Result<{ a: number; b: string; c: boolean; d: number }, Partial<{ a: string; b: symbol; c: number; d: Error }>>
     >(true);
+});
+
+test('Result.all with object narrows first error by key', () => {
+    function f(a: Result<string, number>, b: Result<number, boolean>): void {
+        const all = Result.all({ a, b });
+        eq<typeof all, Result<{ a: string; b: number }, { key: 'a'; error: number } | { key: 'b'; error: boolean }>>(
+            true,
+        );
+
+        if (all.isErr()) {
+            if (all.error.key === 'a') {
+                eq<typeof all.error.error, number>(true);
+            } else {
+                eq<typeof all.error.error, boolean>(true);
+            }
+        }
+    }
+
+    f(Err(1), Err(false));
 });
 
 test('Result.any', () => {

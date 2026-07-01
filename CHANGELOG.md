@@ -3,8 +3,9 @@
 Added:
 
 - Added object overload for `Result.all`, accepting any object type with
-  `Result` values (preserving per-key types). Unlike the array variant, it
-  does not short-circuit and collects all errors.
+  `Result` values (preserving per-key types). By default, it short-circuits
+  with the first error and returns the property name and error. Passing
+  `{ errors: 'all' }` collects all errors.
 
 # 7.0.0
 

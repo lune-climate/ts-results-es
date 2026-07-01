@@ -37,7 +37,22 @@ to combine results with asynchronouse code.
     static all(results: Result<T, E>[]): Result<T[], E>
 
     // Object overload (accepts any object type with Result values, preserving per-key types)
-    static all<T extends Record<string, Result<any, any>>>(results: T): Result<ResultOkTypesRecord<T>, Partial<ResultErrTypesRecord<T>>>
+    static all<const T extends Record<string, Result<any, any>>>(
+        results: T,
+    ): Result<ResultOkTypesRecord<T>, ResultErrEntry<T>>
+
+    static all<const T extends Record<string, Result<any, any>>>(
+        results: T,
+        options: { errors?: 'first' },
+    ): Result<ResultOkTypesRecord<T>, ResultErrEntry<T>>
+
+    static all<const T extends Record<string, Result<any, any>>>(
+        results: T,
+        options: { errors: 'all' },
+    ): Result<
+        ResultOkTypesRecord<T>,
+        Partial<ResultErrTypesRecord<T>>
+    >
 
 Parse a set of ``Result``, returning an array of all ``Ok`` values.
 Short circuits with the first ``Err`` found, if any.
@@ -45,9 +60,12 @@ Short circuits with the first ``Err`` found, if any.
 When called with an object:
 
 Parse an object of ``Result``\s, returning an object of all ``Ok`` values.
-If any ``Result`` is ``Err``, returns an ``Err`` containing an object of all errors
-(only keys that were ``Err`` are present). Unlike the array variant, it does not
-short-circuit and collects all errors.
+By default, it short-circuits with the first ``Err`` and returns an ``Err``
+containing the property name and error. When multiple inputs are ``Err``,
+callers must not rely on which ``Err`` is returned. Passing ``{}`` or
+``{ errors: 'first' }`` makes the default short-circuit behavior explicit.
+Passing ``{ errors: 'all' }`` collects all errors into an object where only keys
+that were ``Err`` are present.
 
 Array example:
 
@@ -59,16 +77,70 @@ Array example:
 
     let toppings = result.unwrap(); // toppings is an array of Topping.  Could throw GetToppingsError.
 
-Object example:
+Successful object example:
 
 .. code-block:: typescript
 
+    const name: Result<string, NameError> = Ok('Alice');
+    const age: Result<number, AgeError> = Ok(36);
+
     let result = Result.all({
-        name: validateName(input.name),  // Result<string, NameError>
-        age: validateAge(input.age),     // Result<number, AgeError>
+        name,
+        age,
     });
-    // Ok({ name: 'Alice', age: 25 }),
-    // type: Result<{ name: string; age: number }, Partial<{ name: NameError; age: AgeError }>>
+    // Ok({ name: 'Alice', age: 36 })
+    // type: Result<
+    //     { name: string; age: number },
+    //     { key: 'name'; error: NameError } | { key: 'age'; error: AgeError }
+    // >
+
+Short-circuiting object errors:
+
+.. code-block:: typescript
+
+    const invalidName: Result<string, NameError> = Err(nameError);
+    const invalidAge: Result<number, AgeError> = Err(ageError);
+
+    let result = Result.all({
+        name: invalidName,
+        age: invalidAge,
+    });
+    // Err({ key: 'name', error: nameError }) or
+    // Err({ key: 'age', error: ageError }); callers must not depend on
+    // which one is returned when multiple inputs are Err.
+    // type: Result<
+    //     { name: string; age: number },
+    //     { key: 'name'; error: NameError } | { key: 'age'; error: AgeError }
+    // >
+
+    let explicitFirst = Result.all({
+        name: invalidName,
+        age: invalidAge,
+    }, { errors: 'first' });
+    // Same behavior and type as the default short-circuit call above.
+
+    let omittedErrors = Result.all({
+        name: invalidName,
+        age: invalidAge,
+    }, {});
+    // Same behavior and type as the default short-circuit call above.
+
+Collecting all object errors:
+
+.. code-block:: typescript
+
+    const invalidName: Result<string, NameError> = Err(nameError);
+    const invalidAge: Result<number, AgeError> = Err(ageError);
+
+    let result = Result.all({
+        name: invalidName,
+        age: invalidAge,
+    }, { errors: 'all' });
+    // Err({ name: nameError, age: ageError })
+    // type: Result<
+    //     { name: string; age: number },
+    //     Partial<{ name: NameError; age: AgeError }>
+    // >
 
 .. _method-Result-andThen:
 
@@ -296,6 +368,38 @@ Example:
 
     type Input = { name: Result<string, Error>; age: Result<number, TypeError> }
     type Output = ResultErrTypesRecord<Input> // { name: Error; age: TypeError }
+
+.. _type-ResultErrEntry:
+
+``ResultErrEntry``
+------------------
+
+.. code-block:: typescript
+
+    type ResultErrEntry<T extends Record<string, Result<any, any>>>
+
+Extracts the keyed first error returned when combining an object of ``Result``\s.
+
+Example:
+
+.. code-block:: typescript
+
+    type FormFields = {
+        name: Result<string, NameError>;
+        age: Result<number, AgeError>;
+    };
+
+    type FieldError = ResultErrEntry<FormFields>;
+    // { key: 'name'; error: NameError } | { key: 'age'; error: AgeError }
+
+    function messageFor(error: FieldError): string {
+        switch (error.key) {
+            case 'name':
+                return formatNameError(error.error);
+            case 'age':
+                return formatAgeError(error.error);
+        }
+    }
 
 .. _attribute-Err-error:
 

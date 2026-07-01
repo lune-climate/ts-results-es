@@ -556,6 +556,34 @@ export type ResultErrTypesRecord<T extends Record<string, Result<any, any>>> = {
     [key in keyof T]: ResultErrType<T[key]>;
 };
 
+/**
+ * Extracts the keyed first error returned when combining
+ * an object of `Result`s.
+ *
+ * @example
+ * ```typescript
+ * type FormFields = {
+ *     name: Result<string, NameError>;
+ *     age: Result<number, AgeError>;
+ * };
+ *
+ * type FieldError = ResultErrEntry<FormFields>;
+ * // { key: 'name'; error: NameError } | { key: 'age'; error: AgeError }
+ *
+ * function messageFor(error: FieldError): string {
+ *     switch (error.key) {
+ *         case 'name':
+ *             return formatNameError(error.error);
+ *         case 'age':
+ *             return formatAgeError(error.error);
+ *     }
+ * }
+ * ```
+ */
+export type ResultErrEntry<T extends Record<string, Result<any, any>>> = {
+    [key in keyof T]: ResultErrType<T[key]> extends never ? never : { key: key; error: ResultErrType<T[key]> };
+}[keyof T];
+
 export namespace Result {
     /**
      * Parse a set of `Result`s, returning an array of all `Ok` values.
@@ -575,24 +603,83 @@ export namespace Result {
     ): Result<ResultOkTypes<T>, ResultErrTypes<T>[number]>;
     /**
      * Parse an object of `Result`s, returning an object of all `Ok` values.
-     * If any `Result` is `Err`, returns an `Err` containing an object of all errors
-     * (only keys that were `Err` are present). Unlike the array variant, it does not
-     * short-circuit and collects all errors.
+     * By default it short-circuits with the first `Err`, returning the property
+     * name and error. When multiple inputs are `Err`, callers must not rely on
+     * which `Err` is returned. Passing `{}` or `{ errors: 'first' }` makes the
+     * default short-circuit behavior explicit. Passing `{ errors: 'all' }`
+     * collects all errors into an object where only keys that were `Err` are
+     * present.
      *
      * @example
      * ```typescript
-     * let result = Result.all({
-     *     name: validateName(input.name),  // Result<string, NameError>
-     *     age: validateAge(input.age),     // Result<number, AgeError>
+     * const name: Result<string, NameError> = Ok('Alice');
+     * const age: Result<number, AgeError> = Ok(36);
+     *
+     * const parsed = Result.all({
+     *     name,
+     *     age,
      * });
-     * // Ok({ name: 'Alice', age: 25 }),
-     * // type: Result<{ name: string; age: number }, Partial<{ name: NameError; age: AgeError }>>
+     * // Ok({ name: 'Alice', age: 36 })
+     * // type: Result<
+     * //     { name: string; age: number },
+     * //     { key: 'name'; error: NameError } | { key: 'age'; error: AgeError }
+     * // >
+     *
+     * const invalidName: Result<string, NameError> = Err(nameError);
+     * const invalidAge: Result<number, AgeError> = Err(ageError);
+     *
+     * const firstError = Result.all({
+     *     name: invalidName,
+     *     age: invalidAge,
+     * });
+     * // Err({ key: 'name', error: nameError }) or
+     * // Err({ key: 'age', error: ageError }); callers must not depend on
+     * // which one is returned when multiple inputs are Err.
+     * // type: Result<
+     * //     { name: string; age: number },
+     * //     { key: 'name'; error: NameError } | { key: 'age'; error: AgeError }
+     * // >
+     *
+     * const sameFirstError = Result.all({
+     *     name: invalidName,
+     *     age: invalidAge,
+     * }, { errors: 'first' });
+     * // Same behavior and type as the default short-circuit call above.
+     *
+     * const omittedErrors = Result.all({
+     *     name: invalidName,
+     *     age: invalidAge,
+     * }, {});
+     * // Same behavior and type as the default short-circuit call above.
+     *
+     * const allErrors = Result.all({
+     *     name: invalidName,
+     *     age: invalidAge,
+     * }, { errors: 'all' });
+     * // Err({ name: nameError, age: ageError })
+     * // type: Result<
+     * //     { name: string; age: number },
+     * //     Partial<{ name: NameError; age: AgeError }>
+     * // >
      * ```
      */
     export function all<const T extends Record<string, Result<any, any>>>(
         results: T,
+    ): Result<ResultOkTypesRecord<T>, ResultErrEntry<T>>;
+    export function all<const T extends Record<string, Result<any, any>>>(
+        results: T,
+        options: { errors?: 'first' },
+    ): Result<ResultOkTypesRecord<T>, ResultErrEntry<T>>;
+    export function all<const T extends Record<string, Result<any, any>>>(
+        results: T,
+        options: { errors: 'all' },
     ): Result<ResultOkTypesRecord<T>, Partial<ResultErrTypesRecord<T>>>;
-    export function all(results: Result<any, any>[] | Record<string, Result<any, any>>): Result<any, any> {
+    // Options whose mode is not known at compile time are intentionally not
+    // supported because the return error shape depends on that mode.
+    export function all(
+        results: Result<any, any>[] | Record<string, Result<any, any>>,
+        options?: { errors?: 'first' | 'all' },
+    ): Result<any, any> {
         if (Array.isArray(results)) {
             const okResult = [];
             for (const result of results) {
@@ -603,7 +690,7 @@ export namespace Result {
                 }
             }
             return new Ok(okResult);
-        } else {
+        } else if (options !== undefined && options.errors === 'all') {
             const okResult: Record<string, any> = {};
             const errResult: Record<string, any> = {};
             let hasErr = false;
@@ -616,6 +703,16 @@ export namespace Result {
                 }
             }
             return hasErr ? new Err(errResult) : new Ok(okResult);
+        } else {
+            const okResult: Record<string, any> = {};
+            for (const [key, result] of Object.entries(results)) {
+                if (result.isOk()) {
+                    okResult[key] = result.value;
+                } else {
+                    return new Err({ key, error: result.error });
+                }
+            }
+            return new Ok(okResult);
         }
     }
 

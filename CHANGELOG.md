@@ -1,4 +1,6 @@
-# Not yet released
+# 7.1.0
+
+Release date: 2026-07-01.
 
 Added:
 

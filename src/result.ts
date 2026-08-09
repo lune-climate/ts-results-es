@@ -83,6 +83,36 @@ interface BaseResult<T, E> extends Iterable<T> {
     unwrap(): T;
 
     /**
+     * Returns the contained `Ok` value.
+     *
+     * Throws the contained `Err` value directly when this result is an `Err`.
+     * Unlike `unwrap()`, it does not wrap the error in a new `Error`.
+     *
+     * @throws The original error contained in `Err`.
+     *
+     * @example
+     * ```typescript
+     *  class MyCustomError extends Error {
+     *      constructor(message: string) {
+     *          super(message);
+     *          Object.setPrototypeOf(this, MyCustomError.prototype);
+     *      }
+     *  }
+     *
+     * const goodResult = new Ok(1);
+     * const badResult = new Err(new MyCustomError("my custom error."));
+     *
+     * goodResult.unwrapOrThrow(); // 1
+     * badResult.unwrapOrThrow();  // throws the original MyCustomError instance directly
+     * //----------------------------------
+     * badResult.unwrap();
+     * // throws a new Error("my custom error.")
+     * // with badResult's MyCustomError available as error.cause
+     * ```
+     */
+    unwrapOrThrow(): T;
+
+    /**
      * Returns the contained `Err` value.
      * Because this function may throw, its use is generally discouraged.
      * Instead, prefer to handle the `Ok` case explicitly and access the `error` property
@@ -353,7 +383,9 @@ export class ErrImpl<E> implements BaseResult<never, E> {
         // See https://github.com/microsoft/TypeScript/issues/45167
         throw new Error(`Tried to unwrap Error: ${toString(this.error)}\n${this._stack}`, { cause: this.error as any });
     }
-
+    unwrapOrThrow(): never {
+        throw this.error;
+    }
     unwrapErr(): E {
         return this.error;
     }
@@ -464,7 +496,9 @@ export class OkImpl<T> implements BaseResult<T, never> {
     unwrap(): T {
         return this.value;
     }
-
+    unwrapOrThrow(): T {
+        return this.value;
+    }
     unwrapErr(): never {
         // The cause casting required because of the current TS definition being overly restrictive
         // (the definition says it has to be an Error while it can be anything).

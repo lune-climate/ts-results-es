@@ -65,7 +65,11 @@ test('unwrap', () => {
     expect(val).toBe(true);
     eq<boolean, typeof val>(true);
 });
-
+test('unwrapOrThrow', () => {
+    const val = Ok(true).unwrapOrThrow();
+    expect(val).toBe(true);
+    eq<boolean, typeof val>(true);
+});
 test('unwrapErr', () => {
     try {
         const err = Ok('boom').unwrapErr();

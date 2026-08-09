@@ -73,7 +73,28 @@ test('unwrap', () => {
         expect((e as Error).cause).toEqual({ message: 'bad error' });
     }
 });
+test('unwrapOrThrow throws the original error', () => {
+    const originalError = new Error('direct error');
 
+    try {
+        Err(originalError).unwrapOrThrow();
+        throw new Error('Unreachable');
+    } catch (error) {
+        expect(error).toBe(originalError);
+    }
+});
+
+test('unwrapOrThrow preserves custom error type', () => {
+    class MyCustomError extends Error {
+        constructor(message: string) {
+            super(message);
+            Object.setPrototypeOf(this, MyCustomError.prototype);
+        }
+    }
+    const originalError = Err(new MyCustomError('my direct custom error.'));
+
+    expect(() => originalError.unwrapOrThrow()).toThrow(MyCustomError);
+});
 test('unwrapErr', () => {
     const err = Err(1).unwrapErr();
     expect(err).toBe(1);
